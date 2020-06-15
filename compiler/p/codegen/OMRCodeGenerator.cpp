@@ -1123,7 +1123,7 @@ static void recordFormPeephole(TR::CodeGenerator *cg, TR::Instruction *cmpiInstr
                      {
                      if (performTransformation(comp, "O^O PPC PEEPHOLE: Change %p to andi_r, remove compare immediate %p.\n", current, cmpiInstruction))
                         {
-                        generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::andi_r, inst->getNode(), inst->getPrimaryTargetRegister(), inst->getSourceRegister(0),cmpiTargetReg, inst->getMask(), current);
+                        generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::andi_r, inst->getNode(), inst->getPrimaryTargetRegister(), inst->getSourceRegister(0),cmpiTargetReg, (uint16_t)inst->getMask(), current);
                         current->remove();
                         cmpiInstruction->remove();
                         }
@@ -3061,7 +3061,7 @@ OMR::Power::CodeGenerator::loadAddressConstantFixed(
    if (tempReg == NULL)
       {
       // lis trgReg, upper 16-bits
-      cursor = firstInstruction = generateTrg1ImmInstruction(self(), TR::InstOpCode::lis, node, trgReg, canEmitData ? (value>>48) : 0 , cursor);
+      cursor = firstInstruction = generateTrg1ImmInstruction(self(), TR::InstOpCode::lis, node, trgReg, canEmitData ? ((int16_t)(value>>48)) : 0 , cursor);
 
       // ori trgReg, trgReg, next 16-bits
       cursor = generateTrg1Src1ImmInstruction(self(), TR::InstOpCode::ori, node, trgReg, trgReg, canEmitData ? ((value>>32) & 0x0000ffff) : 0, cursor);
@@ -3075,7 +3075,7 @@ OMR::Power::CodeGenerator::loadAddressConstantFixed(
    else
       {
       // lis tempReg, bits[0-15]
-      cursor = firstInstruction = generateTrg1ImmInstruction(self(), TR::InstOpCode::lis, node, tempReg, canEmitData ? (value>>48) : 0, cursor);
+      cursor = firstInstruction = generateTrg1ImmInstruction(self(), TR::InstOpCode::lis, node, tempReg, canEmitData ? ((int16_t)(value>>48)) : 0, cursor);
 
       // lis trgReg, bits[32-47]
       cursor = generateTrg1ImmInstruction(self(), TR::InstOpCode::lis, node, trgReg, canEmitData ? ((int16_t)(value>>16)) : 0, cursor);
@@ -3168,7 +3168,7 @@ OMR::Power::CodeGenerator::loadIntConstantFixed(
       cursor = self()->getAppendInstruction();
       }
 
-   cursor = firstInstruction = generateTrg1ImmInstruction(self(), TR::InstOpCode::lis, node, trgReg, value>>16, cursor);
+   cursor = firstInstruction = generateTrg1ImmInstruction(self(), TR::InstOpCode::lis, node, trgReg, (int16_t)(value>>16), cursor);
    cursor = secondInstruction = generateTrg1Src1ImmInstruction(self(), TR::InstOpCode::ori, node, trgReg, trgReg, value&0x0000ffff, cursor);
 
    self()->addMetaDataForLoadIntConstantFixed(node, firstInstruction, secondInstruction, typeAddress, value);
@@ -3555,7 +3555,7 @@ TR::Register *addConstantToLong(TR::Node *node, TR::Register *srcReg,
    // NOTE: the following only works if the second add's immediate is not sign extended
    else if (((int32_t)value == value) && ((value & 0x8000) == 0))
       {
-      generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addis, node, trgReg, srcReg, value >> 16);
+      generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addis, node, trgReg, srcReg, (int16_t)(value >> 16));
       if (value & 0x7fff)
          generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addi2, node, trgReg, trgReg, value & 0x7fff);
       }

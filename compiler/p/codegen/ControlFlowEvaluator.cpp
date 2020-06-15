@@ -2757,17 +2757,20 @@ static void lookupScheme1(TR::Node *node, bool unbalanced, bool fromTableEval, T
          int64_t value = child->getCaseConstant();
          if (cg->comp()->target().is64Bit())
             {
+            // TODO: handle value out of immediate range
             generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::cmpi8, node, cndRegister, selector, value);
             }
          else
             {
             generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::cmpi4, node, cndRegister, selector->getHighOrder(), 0);
             generateConditionalBranchInstruction(cg, TR::InstOpCode::bne, node, toDefaultLabel, cndRegister);
+            // TODO: handle value out of immediate range
             generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::cmpi4, node, cndRegister, selector->getHighOrder(), value);
             } // 64bit target?
          } //64bit int selector
       else
          {
+         // TODO: handle value out of immediate range
          generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::cmpi4, node, cndRegister, selector, fromTableEval?(i-2):(int32_t)(child->getCaseConstant()));
          }
       if (unbalanced)
@@ -2908,6 +2911,7 @@ static void lookupScheme2(TR::Node *node, bool unbalanced, bool fromTableEval, T
          int32_t diff = fromTableEval?1:(node->getChild(i+1)->getCaseConstant()-preInt);
          preInt += diff;
          if (!isInt64)
+            // TODO: handle diff out of immediate range
             generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addi2, node, valRegister, valRegister, (int32_t)diff);
          else
             addConstantToLong(node, valRegister, diff, valRegister, cg);
@@ -2999,7 +3003,7 @@ static void lookupScheme3(TR::Node *node, bool unbalanced, TR::CodeGenerator *cg
          {
          offset *= TR::Compiler->om.sizeofReferenceAddress();
          TR_PPCTableOfConstants::setTOCSlot(offset, address);
-         if (offset<LOWER_IMMED||offset>UPPER_IMMED)
+         if (offset<LOWER_IMMED || offset>UPPER_IMMED)
             {
             TR_ASSERT_FATAL_WITH_NODE(node, 0x00008000 != cg->hiValue(offset), "TOC offset (0x%x) is unexpectedly high. Can not encode upper 16 bits into an addis instruction.", offset);
             generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addis, node, addrRegister, cg->getTOCBaseRegister(), cg->hiValue(offset));

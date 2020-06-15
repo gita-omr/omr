@@ -1247,6 +1247,7 @@ TR::Instruction *OMR::Power::MemoryReference::expandInstruction(TR::Instruction 
 
          if (displacement < LOWER_IMMED || displacement > UPPER_IMMED)
             {
+            TR_ASSERT_FATAL_WITH_NODE(node, 0x00008000 != cg->hiValue(displacement), "TOC offset (0x%x) is unexpectedly high. Can not encode upper 16 bits into an addis instruction.", displacement);
             generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addis, node, data, base, cg->hiValue(displacement), prevInstruction);
             self()->setBaseRegister(data);
             }
@@ -1316,11 +1317,11 @@ TR::Instruction *OMR::Power::MemoryReference::expandInstruction(TR::Instruction 
          if (displacement < LOWER_IMMED || displacement > UPPER_IMMED)
             {
             prevInstruction = generateTrg1ImmInstruction(cg, TR::InstOpCode::lis, node, index, (int16_t)(displacement >> 16), prevInstruction);
-            prevInstruction = generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::ori, node, index, index, displacement & 0xffff, prevInstruction);
+            prevInstruction = generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::ori, node, index, index, (uint16_t)(displacement & 0xffff), prevInstruction);
             }
          else if (displacement != 0)
             {
-            prevInstruction = generateTrg1ImmInstruction(cg, TR::InstOpCode::li, node, index, displacement, prevInstruction);
+            prevInstruction = generateTrg1ImmInstruction(cg, TR::InstOpCode::li, node, index, (int16_t)displacement, prevInstruction);
             }
          else
             {
@@ -1345,7 +1346,7 @@ TR::Instruction *OMR::Power::MemoryReference::expandInstruction(TR::Instruction 
             }
 
          if (displacement != 0)
-            prevInstruction = generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addi, node, base, base, displacement, prevInstruction);
+            prevInstruction = generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addi, node, base, base, (int16_t)displacement, prevInstruction);
 
          self()->setIndexRegister(base);
          self()->setBaseRegister(cg->machine()->getRealRegister(TR::RealRegister::gr0));

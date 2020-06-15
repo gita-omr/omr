@@ -1328,9 +1328,9 @@ void TR::PPCControlFlowInstruction::assignRegisters(TR_RegisterKinds kindToBeAss
          if (isSourceImmediate(2))
             {
             if (currentNode->getOpCode().isUnsigned())
-               cg()->traceRAInstruction(cursor = generateTrg1Src1ImmInstruction(cg(), TR::InstOpCode::cmpli4, currentNode, getTargetRegister(0), getSourceRegister(0), getSourceImmediate(2), cursor));
+               cg()->traceRAInstruction(cursor = generateTrg1Src1ImmInstruction(cg(), TR::InstOpCode::cmpli4, currentNode, getTargetRegister(0), getSourceRegister(0), (uint16_t)getSourceImmediate(2), cursor));
             else
-               cg()->traceRAInstruction(cursor = generateTrg1Src1ImmInstruction(cg(), TR::InstOpCode::cmpi4, currentNode, getTargetRegister(0), getSourceRegister(0), getSourceImmediate(2), cursor));
+               cg()->traceRAInstruction(cursor = generateTrg1Src1ImmInstruction(cg(), TR::InstOpCode::cmpi4, currentNode, getTargetRegister(0), getSourceRegister(0), (int16_t)getSourceImmediate(2), cursor));
             }
          else
             {
@@ -1344,7 +1344,7 @@ void TR::PPCControlFlowInstruction::assignRegisters(TR_RegisterKinds kindToBeAss
          else
             cg()->traceRAInstruction(cursor = generateConditionalBranchInstruction(cg(), TR::InstOpCode::bne, currentNode, label2, getTargetRegister(0), cursor));
          if (isSourceImmediate(3))
-            cg()->traceRAInstruction(cursor = generateTrg1Src1ImmInstruction(cg(), TR::InstOpCode::cmpli4, currentNode, getTargetRegister(0), getSourceRegister(1), getSourceImmediate(3), cursor));
+            cg()->traceRAInstruction(cursor = generateTrg1Src1ImmInstruction(cg(), TR::InstOpCode::cmpli4, currentNode, getTargetRegister(0), getSourceRegister(1), (uint16_t)getSourceImmediate(3), cursor));
          else
             cg()->traceRAInstruction(cursor = generateTrg1Src2Instruction(cg(), TR::InstOpCode::cmpl4, currentNode, getTargetRegister(0), getSourceRegister(1), getSourceRegister(3), cursor));
          if (getOpCode2Value() == TR::InstOpCode::beq)

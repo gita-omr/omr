@@ -3279,7 +3279,7 @@ static inline TR::Register *lorTypeEvaluator(TR::Node *node,
             {
             trgReg = cg->allocateRegister();
             src1Reg = cg->evaluate(firstChild);
-            generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::subfic, node, trgReg, src1Reg, longConst);
+            generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::subfic, node, trgReg, src1Reg, -1);
             }
          else if ((longConst & 0xffffffff) == longConst) // upper 32 bits are all zero
             {

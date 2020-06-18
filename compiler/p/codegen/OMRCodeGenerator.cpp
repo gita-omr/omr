@@ -1123,7 +1123,7 @@ static void recordFormPeephole(TR::CodeGenerator *cg, TR::Instruction *cmpiInstr
                      {
                      if (performTransformation(comp, "O^O PPC PEEPHOLE: Change %p to andi_r, remove compare immediate %p.\n", current, cmpiInstruction))
                         {
-                        generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::andi_r, inst->getNode(), inst->getPrimaryTargetRegister(), inst->getSourceRegister(0),cmpiTargetReg, (uint16_t)inst->getMask(), current);
+                        generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::andi_r, inst->getNode(), inst->getPrimaryTargetRegister(), inst->getSourceRegister(0),cmpiTargetReg, inst->getMask(), current);
                         current->remove();
                         cmpiInstruction->remove();
                         }

@@ -96,7 +96,7 @@ TR::Register *OMR::Power::TreeEvaluator::arraysetEvaluator(TR::Node *node, TR::C
             else
                {
                generateTrg1ImmInstruction(cg, TR::InstOpCode::lis, node, fillReg, (int16_t)halfword);
-               generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::ori, node, fillReg, fillReg, (uint16_t)halfword);
+               generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::ori, node, fillReg, fillReg, halfword);
                }
             }
             break;

@@ -1317,11 +1317,11 @@ TR::Instruction *OMR::Power::MemoryReference::expandInstruction(TR::Instruction 
          if (displacement < LOWER_IMMED || displacement > UPPER_IMMED)
             {
             prevInstruction = generateTrg1ImmInstruction(cg, TR::InstOpCode::lis, node, index, (int16_t)(displacement >> 16), prevInstruction);
-            prevInstruction = generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::ori, node, index, index, (uint16_t)(displacement & 0xffff), prevInstruction);
+            prevInstruction = generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::ori, node, index, index, displacement & 0xffff, prevInstruction);
             }
          else if (displacement != 0)
             {
-            prevInstruction = generateTrg1ImmInstruction(cg, TR::InstOpCode::li, node, index, (int16_t)displacement, prevInstruction);
+            prevInstruction = generateTrg1ImmInstruction(cg, TR::InstOpCode::li, node, index, displacement, prevInstruction);
             }
          else
             {
@@ -1341,12 +1341,20 @@ TR::Instruction *OMR::Power::MemoryReference::expandInstruction(TR::Instruction 
 
          if (displacement < LOWER_IMMED || displacement > UPPER_IMMED)
             {
-            prevInstruction = generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addis, node, base, base, cg->hiValue(displacement), prevInstruction);
+            if (0x00008000 == cg->hiValue(displacement))
+               {
+               generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addis, node, base, base, 0x7FFF);
+               generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addis, node, base, base, 0x1);
+               }
+            else
+               {
+               prevInstruction = generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addis, node, base, base, cg->hiValue(displacement), prevInstruction);
+               }
             displacement = LO_VALUE(displacement);
             }
 
          if (displacement != 0)
-            prevInstruction = generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addi, node, base, base, (int16_t)displacement, prevInstruction);
+            prevInstruction = generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addi, node, base, base, displacement, prevInstruction);
 
          self()->setIndexRegister(base);
          self()->setBaseRegister(cg->machine()->getRealRegister(TR::RealRegister::gr0));

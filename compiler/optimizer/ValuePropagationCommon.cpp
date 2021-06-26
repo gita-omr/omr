@@ -136,7 +136,8 @@ OMR::ValuePropagation::ValuePropagation(TR::OptimizationManager *manager)
      _arrayCloneTypes(trMemory()),
      _parmInfo(NULL),
      _parmTypeValid(NULL),
-     _constNodeInfo(comp()->allocator())
+     _constNodeInfo(comp()->allocator()),
+     _callNodeToGuardNodes(trMemory())
    {
    // DANGER !!!
    // Virtual methods on ValuePropagation should only be called when the most derived class of VP's

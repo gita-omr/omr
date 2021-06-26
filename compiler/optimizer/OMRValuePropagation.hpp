@@ -765,6 +765,8 @@ class ValuePropagation : public TR::Optimization
    //
    TR_Array<TR::CFGEdge *> *_edgesToBeRemoved;
 
+   TR_Array<List<TR_Pair<TR::TreeTop, TR::CFGEdge>>> _callNodeToGuardNodes;
+   
    // Cached constraints
    //
    TR::VPNullObject        *_nullObjectConstraint;

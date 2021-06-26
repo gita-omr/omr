@@ -5400,10 +5400,99 @@ static void devirtualizeCall(OMR::ValuePropagation *vp, TR::Node *node)
    vp->invalidateValueNumberInfo();
    }
 
+static bool canFoldNonOverridenGuard(OMR::ValuePropagation *vp, TR::Node *callNode, TR::Node *guardNode)
+   {
+   TR::SymbolReference *symRef        = callNode->getSymbolReference();
+   TR::MethodSymbol    *methodSymbol  = symRef->getSymbol()->castToMethodSymbol();
+
+   int32_t firstArgIndex = callNode->getFirstArgumentIndex();
+   bool isGlobal;
+   TR::VPConstraint *constraint = vp->getConstraint(callNode->getChild(firstArgIndex), isGlobal);
+   TR_OpaqueClassBlock *thisType;
+   dumpOptDetails(vp->comp(), "Guard %p Call %p constraint %p\n", guardNode, callNode, constraint);
+   if (constraint &&
+       constraint->isFixedClass() &&
+       (thisType = constraint->getClass()) &&
+       methodSymbol->isVirtual())
+      {
+      TR::ResolvedMethodSymbol * resolvedMethodSymbol = methodSymbol->getResolvedMethodSymbol();
+      if (resolvedMethodSymbol)
+         {
+         TR_ResolvedMethod *originalResolvedMethod = resolvedMethodSymbol->getResolvedMethod();
+         TR_OpaqueClassBlock *originalMethodClass = originalResolvedMethod->classOfMethod();
+
+         if ((vp->fe()->isInstanceOf(thisType, originalMethodClass, true, true) == TR_yes) &&
+             !originalResolvedMethod->virtualMethodIsOverridden())
+            {
+            TR_VirtualGuard *virtualGuard = vp->comp()->findVirtualGuardInfo(guardNode);
+            if (virtualGuard && virtualGuard->canBeRemoved())
+               return true;
+            }
+         }
+      }
+      return false;      
+   }
+
+static void removeConditionalBranch(OMR::ValuePropagation *vp, TR::Node *node, TR::CFGEdge *branchEdge)
+   {
+#ifdef J9_PROJECT_SPECIFIC
+   createGuardSiteForRemovedGuard(vp->comp(), node);
+#endif
+
+   // Branch path is unreachable.
+   // Set the edge constraints on the branch path to "unreachable path"
+   //
+   vp->setUnreachablePath(branchEdge);
+
+   // Remove this tree.
+   //
+   vp->removeNode(node, false);
+   vp->_curTree->setNode(NULL);
+   vp->setEnableSimplifier();
+   // Do not remove the branch edge if both
+   // fall-through and target blocks are the same.
+   TR::Block *fallThrough = vp->_curBlock->getExit()->getNextTreeTop()->getNode()->getBlock();
+   TR::Block *target = node->getBranchDestination()->getNode()->getBlock();
+   if (fallThrough != target)
+      vp->_edgesToBeRemoved->add(branchEdge);
+   }
+
+
 TR::Node *constrainCall(OMR::ValuePropagation *vp, TR::Node *node)
    {
    constrainChildren(vp, node);
 
+   if (vp->lastTimeThrough() &&
+       vp->_isGlobalPropagation)
+      {
+      List<TR_Pair<TR::TreeTop, TR::CFGEdge>> &list = (vp->_callNodeToGuardNodes)[node->getGlobalIndex()];
+      ListIterator<TR_Pair<TR::TreeTop, TR::CFGEdge>> iter(&list);
+      TR_Pair<TR::TreeTop, TR::CFGEdge> *pair = iter.getFirst();
+
+      for (; pair; pair = iter.getNext())
+         {
+         TR::TreeTop *treeTop = pair->getKey();
+         TR::Node *guardNode =  treeTop->getNode();
+         TR::CFGEdge *edge = pair->getValue();
+         
+         dumpOptDetails(vp->comp(), "Found saved guard %p for call %p\n", guardNode, node);
+
+         TR_ASSERT_FATAL(guardNode->isTheVirtualGuardForAGuardedInlinedCall() && guardNode->isNonoverriddenGuard(),
+                      "Should be NonoverriddenGuard");
+      
+         if (canFoldNonOverridenGuard(vp, node, guardNode))
+            {
+            dumpOptDetails(vp->comp(), "can fold this time\n");
+            vp->setUnreachablePath(edge);
+            vp->removeNode(guardNode, false);
+            TR::TransformUtil::removeTree(vp->comp(), treeTop);
+            vp->setEnableSimplifier();
+            vp->_edgesToBeRemoved->add(edge);
+            }
+         }
+      }
+
+   
    if (node->getSymbolReference()->isOSRInductionHelper())
       {
       vp->createExceptionEdgeConstraints(TR::Block::CanCatchOSR, NULL, node);
@@ -8767,29 +8856,6 @@ static void changeConditionalToGoto(OMR::ValuePropagation *vp, TR::Node *node, T
    vp->printEdgeConstraints(vp->createEdgeConstraints(edge, true));
    }
 
-static void removeConditionalBranch(OMR::ValuePropagation *vp, TR::Node *node, TR::CFGEdge *branchEdge)
-   {
-#ifdef J9_PROJECT_SPECIFIC
-   createGuardSiteForRemovedGuard(vp->comp(), node);
-#endif
-
-   // Branch path is unreachable.
-   // Set the edge constraints on the branch path to "unreachable path"
-   //
-   vp->setUnreachablePath(branchEdge);
-
-   // Remove this tree.
-   //
-   vp->removeNode(node, false);
-   vp->_curTree->setNode(NULL);
-   vp->setEnableSimplifier();
-   // Do not remove the branch edge if both
-   // fall-through and target blocks are the same.
-   TR::Block *fallThrough = vp->_curBlock->getExit()->getNextTreeTop()->getNode()->getBlock();
-   TR::Block *target = node->getBranchDestination()->getNode()->getBlock();
-   if (fallThrough != target)
-      vp->_edgesToBeRemoved->add(branchEdge);
-   }
 
 // Constrain objects that pass a type test, given a constraint on the class
 // against which the object is to be tested.
@@ -9429,39 +9495,26 @@ static TR::Node *constrainIfcmpeqne(OMR::ValuePropagation *vp, TR::Node *node, b
       TR::Node *callNode = node->getVirtualCallNodeForGuard();
 
       if (callNode &&
-          callNode->getOpCode().isCallIndirect())
+          callNode->getOpCode().isCall())
          {
-         TR::SymbolReference *symRef        = callNode->getSymbolReference();
-         TR::MethodSymbol    *methodSymbol  = symRef->getSymbol()->castToMethodSymbol();
-
-         int32_t firstArgIndex = callNode->getFirstArgumentIndex();
-         bool isGlobal;
-         TR::VPConstraint *constraint = vp->getConstraint(callNode->getChild(firstArgIndex), isGlobal);
-         TR_OpaqueClassBlock *thisType;
-         //dumpOptDetails(vp->comp(), "Guard %p Call %p constraint %p\n", node, callNode, constraint);
-         if (constraint &&
-             constraint->isFixedClass() &&
-             (thisType = constraint->getClass()) &&
-              methodSymbol->isVirtual())
+         virtualGuardWillBeEliminated = canFoldNonOverridenGuard(vp, callNode, node);
+         if (!virtualGuardWillBeEliminated &&
+             vp->lastTimeThrough() &&
+             vp->_isGlobalPropagation)
             {
-            TR::ResolvedMethodSymbol * resolvedMethodSymbol = methodSymbol->getResolvedMethodSymbol();
-            if (resolvedMethodSymbol)
-               {
-               TR_ResolvedMethod *originalResolvedMethod = resolvedMethodSymbol->getResolvedMethod();
-               TR_OpaqueClassBlock *originalMethodClass = originalResolvedMethod->classOfMethod();
-
-               if ((vp->fe()->isInstanceOf(thisType, originalMethodClass, true, true) == TR_yes) &&
-                   !originalResolvedMethod->virtualMethodIsOverridden())
-                 {
-                 virtualGuardConstraint = constraint;
-                 TR_VirtualGuard *virtualGuard = vp->comp()->findVirtualGuardInfo(node);
-                 if (virtualGuard && virtualGuard->canBeRemoved())
-                    virtualGuardWillBeEliminated = true;
-                 }
-              }
-           }
-        }
-     }
+            dumpOptDetails(vp->comp(), "Saving guard %p for call %p\n", node, callNode);
+            TR_Pair<TR::TreeTop, TR::CFGEdge> *pair = new (vp->comp()->trHeapMemory())
+                                                   TR_Pair<TR::TreeTop, TR::CFGEdge>(vp->_curTree, edge);
+            List<TR_Pair<TR::TreeTop, TR::CFGEdge>> &list = (vp->_callNodeToGuardNodes)[callNode->getGlobalIndex()];
+            list.setRegion(vp->comp()->trMemory()->heapMemoryRegion());
+            list.add(pair);
+            }
+         else if (virtualGuardWillBeEliminated)
+            {
+            dumpOptDetails(vp->comp(), "Removing guard %p for call %p\n", node, callNode);
+            }
+         }
+      }
 
    // Apply new constraints to the branch edge
    //
@@ -9665,7 +9718,7 @@ static TR::Node *constrainIfcmpeqne(OMR::ValuePropagation *vp, TR::Node *node, b
          }
       }
 
-   if (virtualGuardConstraint && virtualGuardWillBeEliminated)
+   if (virtualGuardWillBeEliminated)
       cannotBranch = true;
 
    if (node->getOpCodeValue() != TR::ifacmpeq && node->getOpCodeValue() != TR::ifacmpne)

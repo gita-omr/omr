@@ -3280,45 +3280,56 @@ TR::TreeTop *
 OMR::Node::getVirtualCallTreeForGuard()
    {
    TR::Node *guard = self();
-   TR::TreeTop * callTree = 0;
+   TR::TreeTop * callTree = NULL;
+   TR::Compilation *comp = TR::comp();
+   int32_t guardIndex = getInlinedSiteIndex();
+   
+   if (guardIndex < 0)  // sometimes it's -1, return conservative result
+      return NULL;
+   
+   int32_t guardCallerIndex = comp->getInlinedCallSite(guardIndex)._byteCodeInfo.getCallerIndex();
+   
    while (1)
       {
       // Call node is not necessarily the first real tree top in the call block
-      // there may be a stores/loads introduced by the global register allocator.
+      // there may be stores/loads introduced by the global register allocator,
+      // or stores to privitized inliner arguments.
+      //
+      // A call can be indirect or direct(if localVP de-virtualized it).
+      // To make sure it's the right call we compare guard's caller index with
+      // call's inlined site index.
       //
       callTree = guard->getBranchDestination()->getNextRealTreeTop();
-      TR::Node * callNode = 0;
-      //while (callTree->getNode()->getOpCode().isLoadDirectOrReg() ||
-      //       callTree->getNode()->getOpCode().isStoreDirectOrReg())
-      //
+      TR::Node * callNode = callTree->getNode();
+
       while (callTree->getNode()->getOpCodeValue() != TR::BBEnd)
          {
-         callNode = callTree->getNode();
          if ((!callNode->getOpCode().isCall()) &&
              (callNode->getNumChildren() > 0))
             callNode = callTree->getNode()->getFirstChild();
 
-         if ((callNode &&
-              callNode->getOpCode().isCallIndirect()) ||
-             (callTree->getNode()->getOpCodeValue() == TR::Goto))
+         if (callNode->getOpCode().isCall() ||
+             callTree->getNode()->getOpCodeValue() == TR::Goto)
             break;
 
          callTree = callTree->getNextRealTreeTop();
+         callNode = callTree->getNode();
          }
 
-      if (!callNode || !callNode->getOpCode().isCallIndirect())
+      if (callTree->getNode()->getOpCodeValue() == TR::Goto)
          {
-         if (callTree->getNode()->getOpCodeValue() == TR::Goto)
-            {
-            guard = callTree->getNode();
-            continue;
-            }
-
-         //TR_ASSERT(0, "could not find call node for a virtual guard");
-         return NULL;
+         guard = callTree->getNode();
+         continue;
+         }
+      else if (!callNode->getOpCode().isCall() ||
+               callNode->getInlinedSiteIndex() != guardCallerIndex)
+         { 
+         return NULL;         
          }
       else
+         {
          break;
+         }
       }
 
    return callTree;

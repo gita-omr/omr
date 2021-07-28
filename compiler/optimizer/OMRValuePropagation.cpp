@@ -4081,7 +4081,6 @@ void TR::GlobalValuePropagation::processStructure(TR_StructureSubGraphNode *node
    TR_RegionStructure *region = node->getStructure()->asRegion();
    if (region)
       {
-      _defMergedNodes->empty();
       if (region->isAcyclic())
          {
          processAcyclicRegion(node, lastTimeThrough, insideLoop);
@@ -4092,6 +4091,9 @@ void TR::GlobalValuePropagation::processStructure(TR_StructureSubGraphNode *node
          }
       else
          {
+         // Only commoned nodes within an extended block need to be set
+         // in _defMergedNodes. So it's safe to reset it here
+         _defMergedNodes->empty();
          processImproperLoop(node, lastTimeThrough, insideLoop);
          }
       }
@@ -4466,6 +4468,11 @@ void TR::GlobalValuePropagation::processRegionSubgraph(TR_StructureSubGraphNode 
    // have been handled before we reach here.
    // Current constraints have already been set up to be the input constraints.
    //
+   
+   // Only commoned nodes within an extended block need to be set
+   // in _defMergedNodes. So it's safe to reset it here
+   _defMergedNodes->empty();
+
    TR_RegionStructure *region = node->getStructure()->asRegion();
    TR_StructureSubGraphNode *entry = region->getEntry();
 

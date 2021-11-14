@@ -994,17 +994,17 @@ OMR::SymbolReferenceTable::methodSymRefFromName(TR::ResolvedMethodSymbol * ownin
 TR::SymbolReference *
 OMR::SymbolReferenceTable::findOrCreateSymRefWithKnownObject(TR::SymbolReference *original, uintptr_t *referenceLocation)
    {
-   return findOrCreateSymRefWithKnownObject(original, referenceLocation, false);
+   return findOrCreateSymRefWithKnownObject(original, referenceLocation, false, 0);
    }
 
 TR::SymbolReference *
-OMR::SymbolReferenceTable::findOrCreateSymRefWithKnownObject(TR::SymbolReference *original, uintptr_t *referenceLocation, bool isArrayWithConstantElements)
+OMR::SymbolReferenceTable::findOrCreateSymRefWithKnownObject(TR::SymbolReference *original, uintptr_t *referenceLocation, bool isArrayWithConstantElements, int32_t stableArrayRank)
    {
    TR::KnownObjectTable *knot = comp()->getOrCreateKnownObjectTable();
    if (!knot)
       return original;
 
-   TR::KnownObjectTable::Index objectIndex = knot->getOrCreateIndexAt(referenceLocation, isArrayWithConstantElements);
+   TR::KnownObjectTable::Index objectIndex = knot->getOrCreateIndexAt(referenceLocation, isArrayWithConstantElements, stableArrayRank);
    return findOrCreateSymRefWithKnownObject(original, objectIndex);
    }
 

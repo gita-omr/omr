@@ -961,6 +961,7 @@ class VPKnownObject : public TR::VPFixedClass
 
    virtual TR_YesNoMaybe isJavaLangClassObject();
    virtual bool isArrayWithConstantElements(TR::Compilation * comp);
+   virtual bool isArrayWithStableElements(TR::Compilation * comp);
 
    virtual bool mustBeEqual(TR::VPConstraint *other, OMR::ValuePropagation *vp);
    virtual bool mustBeNotEqual(TR::VPConstraint *other, OMR::ValuePropagation *vp);

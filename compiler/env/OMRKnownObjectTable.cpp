@@ -86,6 +86,14 @@ OMR::KnownObjectTable::isArrayWithConstantElements(Index index)
    return false;
    }
 
+bool
+OMR::KnownObjectTable::isArrayWithStableElements(Index index)
+   {
+   TR_ASSERT(index != UNKNOWN && 0 <= index && index < self()->getEndIndex(), "isArrayWithConstantElements(%d): index must be in range 0..%d", index, self()->getEndIndex());
+   return false;
+   }
+
+
 uintptr_t *
 OMR::KnownObjectTable::getPointerLocation(Index index)
    {

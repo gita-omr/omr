@@ -87,6 +87,9 @@ public:
    // API for checking if an known object is an array with immutable elements
    bool isArrayWithConstantElements(Index index);
 
+   // API for checking if an known object is an array with stable elements
+   virtual bool isArrayWithStableElements(Index index);
+
    Index getOrCreateIndexAt(uintptr_t *objectReferenceLocation);
    Index getOrCreateIndexAt(uintptr_t *objectReferenceLocation, bool isArrayWithConstantElements);
    Index getExistingIndexAt(uintptr_t *objectReferenceLocation);

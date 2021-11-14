@@ -332,6 +332,7 @@ static void constrainBaseObjectOfIndirectAccess(OMR::ValuePropagation *vp, TR::N
       }
    }
 
+
 // When node is successfully folded, isGlobal is set to true iff all
 // constraints in the chain were global, and false otherwise.
 static bool tryFoldCompileTimeLoad(
@@ -410,7 +411,7 @@ static bool tryFoldCompileTimeLoad(
                   // Invalidate alias info so that it can be recomputed in the next optimization that needs it
                   vp->optimizer()->setAliasSetsAreValid(false);
                   }
-               else
+               else if (!constraint->getKnownObject()->isArrayWithStableElements(vp->comp()))
                   break;
                }
 

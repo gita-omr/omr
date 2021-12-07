@@ -660,6 +660,7 @@ class OMR_EXTENSIBLE TreeEvaluator: public OMR::TreeEvaluator
    static TR::Register *vdcmpeqEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *vdcmpgeEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *vdcmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg);
+   static TR::Register *vscmpgtEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *vdcmpleEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *vdcmpltEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *vdsqrtEvaluator(TR::Node *node, TR::CodeGenerator *cg);

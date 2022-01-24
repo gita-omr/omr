@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2021 IBM Corp. and others
+ * Copyright (c) 2000, 2022 IBM Corp. and others
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which accompanies this
@@ -1075,15 +1075,20 @@ TR_GlobalRegisterNumber OMR::Power::CodeGenerator::pickRegister(TR_RegisterCandi
          lastVolIndex = _lastVolatileGPR;
          break;
 
-      case TR::VectorInt32:
-      case TR::VectorDouble:
-          isVector = true;
-          firstIndex = self()->getFirstGlobalVRF();
-          lastIndex = self()->getLastGlobalVRF();
-          lastVolIndex = lastIndex;  // TODO: preserved VRF's !!
-         break;
-
       default:
+         if (sym->getDataType().isVector())
+            {
+            if (sym->getDataType().getVectorElementType() == TR::Int32 ||
+                sym->getDataType().getVectorElementType() == TR::Double)
+               {
+               isVector = true;
+               firstIndex = self()->getFirstGlobalVRF();
+               lastIndex = self()->getLastGlobalVRF();
+               lastVolIndex = lastIndex;  // TODO: preserved VRF's !!
+               break;
+               }
+            }
+
          firstIndex = _firstGPR;
          lastIndex  = _lastFPR ;
          lastVolIndex = _lastVolatileGPR;
@@ -1755,8 +1760,9 @@ OMR::Power::CodeGenerator::freeAndResetTransientLongs()
 
 
 
-bool OMR::Power::CodeGenerator::getSupportsOpCodeForAutoSIMD(TR::ILOpCode opcode, TR::DataType dt)
+bool OMR::Power::CodeGenerator::getSupportsOpCodeForAutoSIMD(TR::ILOpCode opcode, TR::DataType dt, TR::VectorLength length)
    {
+   if(length != TR::VectorLength128) return false;
 
    // alignment issues
    if (!self()->comp()->target().cpu.isAtLeast(OMR_PROCESSOR_PPC_P8) &&

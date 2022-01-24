@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2021 IBM Corp. and others
+ * Copyright (c) 2000, 2022 IBM Corp. and others
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which accompanies this
@@ -1090,7 +1090,7 @@ public:
     * @return the list of registers which is assigned first time in OOL cold path
     */
    TR::list<TR::Register*> *getFirstTimeLiveOOLRegisterList() {return _firstTimeLiveOOLRegisterList;}
-   
+
    /**
     * @brief Sets the list of registers which is assigned first time in OOL cold path
     *
@@ -1630,7 +1630,7 @@ public:
    bool getSupportsAutoSIMD() { return _flags4.testAny(SupportsAutoSIMD);}
    void setSupportsAutoSIMD() { _flags4.set(SupportsAutoSIMD);}
 
-   bool getSupportsOpCodeForAutoSIMD(TR::ILOpCode, TR::DataType) { return false; }
+   bool getSupportsOpCodeForAutoSIMD(TR::ILOpCode, TR::DataType, int32_t) { return false; }
 
    bool removeRegisterHogsInLowerTreesWalk() { return _flags3.testAny(RemoveRegisterHogsInLowerTreesWalk);}
    void setRemoveRegisterHogsInLowerTreesWalk() { _flags3.set(RemoveRegisterHogsInLowerTreesWalk);}

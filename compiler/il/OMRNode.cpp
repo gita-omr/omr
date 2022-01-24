@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2021 IBM Corp. and others
+ * Copyright (c) 2000, 2022 IBM Corp. and others
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which accompanies this
@@ -2120,11 +2120,6 @@ OMR::Node::isConstZeroBytes()
          return self()->getFloatBits() == 0;
       case TR::Double:
          return self()->getDoubleBits() == 0;
-      case TR::VectorInt8:
-      case TR::VectorInt16:
-      case TR::VectorInt32:
-      case TR::VectorInt64:
-      case TR::VectorDouble:
       default:
          TR_ASSERT(false, "Unrecognized const node %s can't be checked for zero bytes");
          return false;
@@ -2160,11 +2155,6 @@ OMR::Node::isConstZeroValue()
          TR::Compilation *comp = TR::comp();
          return self()->getDoubleBits() == DOUBLE_POS_ZERO;
          }
-      case TR::VectorInt8:
-      case TR::VectorInt16:
-      case TR::VectorInt32:
-      case TR::VectorInt64:
-      case TR::VectorDouble:
       default:
          TR_ASSERT(false, "Unrecognized constant node can't be checked for zero");
          return false;
@@ -3283,17 +3273,17 @@ OMR::Node::getVirtualCallTreeForGuard()
    TR::TreeTop * callTree = NULL;
    TR::Compilation *comp = TR::comp();
    int32_t guardInlinedSiteIndex = guard->getInlinedSiteIndex();
-      
+
    if (guardInlinedSiteIndex < 0)
       {
       // EscapeAnalysis can create a guard with index -1
       // in that case, return conservative result
       return NULL;
       }
-   
+
    int32_t guardCallerIndex = comp->getInlinedCallSite(guardInlinedSiteIndex)._byteCodeInfo.getCallerIndex();
    uint32_t guardCallerByteCodeIndex = comp->getInlinedCallSite(guardInlinedSiteIndex)._byteCodeInfo.getByteCodeIndex();
-   
+
    while (1)
       {
       // Call node is not necessarily the first real tree top in the call block
@@ -3331,7 +3321,7 @@ OMR::Node::getVirtualCallTreeForGuard()
                callNode->getByteCodeIndex() != guardCallerByteCodeIndex ||
                !callNode->isTheVirtualCallNodeForAGuardedInlinedCall())
          {
-         return NULL;         
+         return NULL;
          }
       else
          {
@@ -5269,7 +5259,8 @@ OMR::Node::computeDataType()
          else if (_opCode.isVectorReduction())
             _unionPropertyA._dataType = self()->getFirstChild()->getDataType().getVectorElementType().getDataType();
          else if (_opCode.getOpCodeValue() == TR::vsplats)
-            _unionPropertyA._dataType = self()->getFirstChild()->getDataType().scalarToVector().getDataType();
+            // TODO: convert vsplats into 'true' vector opcode that has proper element type and length
+            _unionPropertyA._dataType = self()->getFirstChild()->getDataType().scalarToVector(TR::VectorLength128).getDataType();
          else
             _unionPropertyA._dataType = self()->getFirstChild()->getDataType().getDataType();
 

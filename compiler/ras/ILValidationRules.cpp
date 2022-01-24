@@ -461,11 +461,11 @@ void TR::ValidateChildTypes::validate(TR::Node *node)
 
             const auto expChildType = opcode.expectedChildType(i);
             const auto actChildType = childOpcode.getDataType().getDataType();
-            const auto expChildTypeName = (expChildType >= TR::NumTypes) ?
+            const auto expChildTypeName = (expChildType >= TR::NumAllTypes) ?
                                            "UnspecifiedChildType" :
                                            TR::DataType::getName(expChildType);
             const auto actChildTypeName = TR::DataType::getName(actChildType);
-            TR::checkILCondition(node, (expChildType >= TR::NumTypes || actChildType == expChildType),
+            TR::checkILCondition(node, (expChildType >= TR::NumAllTypes || actChildType == expChildType),
                                  comp(), "Child %d has unexpected type %s (expected %s)",
                                  i, actChildTypeName, expChildTypeName);
             }

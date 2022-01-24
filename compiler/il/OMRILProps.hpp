@@ -123,7 +123,7 @@ namespace ILChildProp
 
 // make sure that all TR::DataTypes can fit in one byte
 // (remembering that 255 is a reserved value)
-static_assert(TR::NumTypes < 254, "There are too many data types to fit in one byte.");
+static_assert(TR::NumAllTypes < 254, "There are too many data types to fit in one byte.");
 
 #define FIRST_CHILD(type)     (type) <<  0
 #define SECOND_CHILD(type)    (type) <<  8

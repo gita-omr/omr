@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2021 IBM Corp. and others
+ * Copyright (c) 2000, 2022 IBM Corp. and others
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which accompanies this
@@ -359,14 +359,14 @@ class OMR_EXTENSIBLE CodeGenerator : public OMR::CodeGenerator
    bool hasComplexAddressingMode() { return true; }
    bool getSupportsBitOpCodes() { return true; }
 
-   bool getSupportsOpCodeForAutoSIMD(TR::ILOpCode, TR::DataType);
+   bool getSupportsOpCodeForAutoSIMD(TR::ILOpCode, TR::DataType, int32_t);
    bool getSupportsEncodeUtf16LittleWithSurrogateTest();
    bool getSupportsEncodeUtf16BigWithSurrogateTest();
 
    virtual bool getSupportsBitPermute();
 
    bool supportsNonHelper(TR::SymbolReferenceTable::CommonNonhelperSymbol symbol);
-   
+
    static bool isILOpCodeSupported(TR::ILOpCodes);
 
    bool hasTMEvaluator()                       {return true;}

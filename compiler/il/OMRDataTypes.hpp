@@ -216,6 +216,18 @@ enum TR_SharedCacheHint
 namespace TR
 {
 
+enum VectorLength
+   {
+   NoVectorLength=0,
+   VectorLength128,
+   VectorLength256,
+   VectorLength512,
+   VectorLength64,
+   // TODO: Redefine, preferably based on platform, when some platform starts supporting other than 128-bit
+   // Defining per platform is not necessary for functional correctness but for reducing NumAllTypes
+   NumVectorLengths = VectorLength128
+   };
+
 /**
  * Data type supported by OMR and whatever the configured language is.
  */
@@ -229,18 +241,22 @@ enum DataTypes
    Float,
    Double,
    Address,
-   VectorInt8,
-   VectorInt16,
-   VectorInt32,
-   VectorInt64,
-   VectorFloat,
-   VectorDouble,
    Aggregate,
    NumOMRTypes,
 #include "il/DataTypesEnum.hpp"
-   NumTypes
+   NumNonVectorTypes,
+   NumVectorElementTypes = Double,
+   //
+   // this space is reserved for vector types generated at runtime
+   // the generated types can be used to index tables of size NumAllTypes as any other type
+   //
+   NumAllTypes =  NumNonVectorTypes + NumVectorElementTypes * NumVectorLengths
    };
+
 }
+
+
+
 
 /**
  * @name OMRDataTypeIntegerLimits
@@ -337,6 +353,16 @@ namespace OMR
 class OMR_EXTENSIBLE DataType
    {
 public:
+
+   // will be removed when all vector opcodes are switched to new ones
+   // as well as TRIL and JitBuilder
+   static const TR::DataTypes Vector128Int8;
+   static const TR::DataTypes Vector128Int16;
+   static const TR::DataTypes Vector128Int32;
+   static const TR::DataTypes Vector128Int64;
+   static const TR::DataTypes Vector128Float;
+   static const TR::DataTypes Vector128Double;
+
    DataType() : _type(TR::NoType) { }
    DataType(TR::DataTypes t) : _type(t) { }
 
@@ -388,10 +414,13 @@ public:
    int32_t getMaxPrecisionFromType();
 
    TR::DataType getVectorIntegralType();
-   TR::DataType getVectorElementType();
+   inline TR::DataType getVectorElementType();
+   inline TR::VectorLength getVectorLength();
+   inline static TR::DataTypes createVectorType(TR::DataTypes elementType, TR::VectorLength length);
+   inline static TR::VectorLength bitsToVectorLength(int32_t bits);
 
    TR::DataType vectorToScalar();
-   TR::DataType scalarToVector();
+   TR::DataType scalarToVector(TR::VectorLength);
 
    const char * toString() const;
 
@@ -406,7 +435,6 @@ public:
    static const char    * getName(TR::DataType dt);
    static int32_t         getSize(TR::DataType dt);
    static void            setSize(TR::DataType dt, int32_t newValue);
-   static const char    * getPrefix(TR::DataType dt);
 
    template <typename T> static bool isSignedInt8()  { return false; }
    template <typename T> static bool isSignedInt16() { return false; }

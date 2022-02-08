@@ -6907,7 +6907,7 @@ OPCODE_MACRO(\
    /* .properties3          = */ 0, \
    /* .properties4          = */ 0, \
    /* .dataType             = */ TR::NoType, \
-   /* .typeProperties       = */ ILTypeProp::Size_16 | ILTypeProp::Integer | ILTypeProp::HasNoDataType, \
+   /* .typeProperties       = */ ILTypeProp::Size_16 | ILTypeProp::Vector | ILTypeProp::HasNoDataType, \
    /* .childProperties      = */ THREE_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
    /* .swapChildrenOpCode   = */ TR::BadILOp, \
    /* .reverseBranchOpCode  = */ TR::BadILOp, \

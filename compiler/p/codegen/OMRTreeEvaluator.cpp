@@ -6294,7 +6294,7 @@ TR::Register *OMR::Power::TreeEvaluator::unImpOpEvaluator(TR::Node *node, TR::Co
    int *i = NULL;
    *i = 42; // cause a failure
 #else
-   TR_ASSERT(false, "Unimplemented evaluator for opcode %d\n", node->getOpCodeValue());
+   TR_ASSERT_FATAL(false, "Unimplemented evaluator for opcode %d\n", node->getOpCodeValue());
 #endif
    return NULL;
    }

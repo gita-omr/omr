@@ -15632,7 +15632,7 @@ bool canUseNodeForFusedMultiply(TR::Node *node)
 bool
 generateFusedMultiplyAddIfPossible(TR::CodeGenerator *cg, TR::Node *addNode, TR::InstOpCode::Mnemonic op, TR::InstOpCode::Mnemonic negateOp)
    {
-   TR_ASSERT_FATAL_WITH_NODE(node, !addNode->getDataType().isVector() ||
+   TR_ASSERT_FATAL_WITH_NODE(addNode, !addNode->getDataType().isVector() ||
                    addNode->getDataType().getVectorLength() == TR::VectorLength128,
                    "Only 128-bit vectors are supported %s", addNode->getDataType().toString());
 

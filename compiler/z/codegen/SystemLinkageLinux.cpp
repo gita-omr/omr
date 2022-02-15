@@ -593,7 +593,7 @@ TR::S390zLinuxSystemLinkage::initParamOffset(TR::ResolvedMethodSymbol * method, 
                // TODO: exclude Float?
                indexInArgRegistersArray = numVectorArgs;
                argRegNum = getVectorArgumentRegister(indexInArgRegistersArray);
-               numVectorArgs ++;
+               numVectorArgs++;
                }
             break;
             }

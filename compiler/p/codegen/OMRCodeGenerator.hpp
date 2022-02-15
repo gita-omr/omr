@@ -282,7 +282,7 @@ public:
       return false;
       }
 
-   bool getSupportsOpCodeForAutoSIMD(TR::ILOpCode, TR::DataType, int32_t);
+   bool getSupportsOpCodeForAutoSIMD(TR::ILOpCode, TR::DataType, TR::VectorLength);
 
    bool getSupportsEncodeUtf16LittleWithSurrogateTest();
 

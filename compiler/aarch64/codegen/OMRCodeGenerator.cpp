@@ -612,9 +612,9 @@ int64_t OMR::ARM64::CodeGenerator::getSmallestPosConstThatMustBeMaterialized()
    }
 
 
-bool OMR::ARM64::CodeGenerator::getSupportsOpCodeForAutoSIMD(TR::ILOpCode opcode, TR::DataType dt, int32_t length)
+bool OMR::ARM64::CodeGenerator::getSupportsOpCodeForAutoSIMD(TR::ILOpCode opcode, TR::DataType dt, TR::VectorLength length)
    {
-   if(length != 128) return false;
+   if(length != TR::VectorLength128) return false;
 
    // implemented vector opcodes
    switch (opcode.getOpCodeValue())

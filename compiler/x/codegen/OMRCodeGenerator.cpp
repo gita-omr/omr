@@ -988,9 +988,9 @@ bool OMR::X86::CodeGenerator::supportsAddressRematerialization()         { stati
 #undef CAN_REMATERIALIZE
 
 bool
-OMR::X86::CodeGenerator::getSupportsOpCodeForAutoSIMD(TR::ILOpCode opcode, TR::DataType dt, int32_t length)
+OMR::X86::CodeGenerator::getSupportsOpCodeForAutoSIMD(TR::ILOpCode opcode, TR::DataType dt, TR::VectorLength length)
    {
-   if(length != 128) return false;
+   if(length != TR::VectorLength128) return false;
 
    /*
     * Most of the vector evaluators for opcodes used in AutoSIMD have been implemented.

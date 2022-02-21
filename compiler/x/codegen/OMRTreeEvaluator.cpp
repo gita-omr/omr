@@ -4135,12 +4135,12 @@ TR::Register* OMR::X86::TreeEvaluator::FloatingPointAndVectorBinaryArithmeticEva
                              "Only 128-bit vectors are supported right now\n");
 
    auto arithmetic = BinaryArithmeticInvalid;
+   TR::ILOpCodes opcode = node->getOpCodeValue();
 
-   switch (node->getOpCodeValue())
+   switch (opcode)
       {
       case TR::fadd:
       case TR::dadd:
-      case TR::vadd:
          arithmetic = BinaryArithmeticAdd;
          break;
       case TR::fsub:
@@ -4168,6 +4168,11 @@ TR::Register* OMR::X86::TreeEvaluator::FloatingPointAndVectorBinaryArithmeticEva
          arithmetic = BinaryArithmeticXor;
          break;
       default:
+         if (OMR::ILOpCode::isVectorOpCode(opcode) && OMR::ILOpCode::getVectorOperation(opcode) == OMR::vadd)
+            {
+            arithmetic = BinaryArithmeticAdd;
+            break;
+            }
          TR_ASSERT(false, "Unsupported OpCode");
       }
 

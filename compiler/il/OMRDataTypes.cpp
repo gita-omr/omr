@@ -271,8 +271,19 @@ OMR::DataType::getName(TR::DataType dt)
       TR_ASSERT_FATAL(staticallyInitialized && (OMRDataTypeNames[dt] != NULL), "Vector names should've been initialized");
       }
 
-   TR_ASSERT(dt < TR::NumOMRTypes, "Name requested for unknown datatype");
+   TR_ASSERT(dt < TR::NumAllTypes, "Name requested for unknown datatype %d", dt);
    return OMRDataTypeNames[dt];
+   }
+
+TR::DataType
+OMR::DataType::getTypeFromName(const char *name)
+   {
+   for (int32_t i = 1 ; i < TR::NumAllTypes; i++)
+      {
+      if (strcmp(name, getName((TR::DataTypes)i)) == 0)
+         return (TR::DataTypes)i;
+      }
+   return TR::NoType;
    }
 
 const char *

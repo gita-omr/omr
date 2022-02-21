@@ -75,7 +75,22 @@ template <class T> class TR_Array;
 template <class T> class TR_Stack;
 
 typedef TR::Node* (* ValuePropagationPtr)(OMR::ValuePropagation *, TR::Node *);
-extern const ValuePropagationPtr constraintHandlers[];
+
+class ValuePropagationPtrTable
+   {
+   private:
+   static const ValuePropagationPtr table[];
+
+   static void checkTableSize();
+
+   public:
+   ValuePropagationPtr operator[] (TR::ILOpCode opcode) const
+      {
+      return table[opcode.getTableIndex()];
+      }
+   };
+
+extern const ValuePropagationPtrTable constraintHandlers;
 
 typedef TR::typed_allocator<std::pair<TR::CFGEdge * const, TR_BitVector*>, TR::Region &> DefinedOnAllPathsMapAllocator;
 typedef std::map<TR::CFGEdge *, TR_BitVector *, std::less<TR::CFGEdge *>, DefinedOnAllPathsMapAllocator> DefinedOnAllPathsMap;
@@ -834,7 +849,7 @@ class ValuePropagation : public TR::Optimization
    TR_Array<TR::CFGEdge *> *_edgesToBeRemoved;
 
    CallNodeToGuardNodesMap *_callNodeToGuardNodes;
-   
+
    // Cached constraints
    //
    TR::VPNullObject        *_nullObjectConstraint;

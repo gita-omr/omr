@@ -250,7 +250,8 @@ enum DataTypes
    // this space is reserved for vector types generated at runtime
    // the generated types can be used to index tables of size NumAllTypes as any other type
    //
-   NumAllTypes =  NumNonVectorTypes + NumVectorElementTypes * NumVectorLengths
+   NumVectorTypes = NumVectorElementTypes * NumVectorLengths,
+   NumAllTypes =  NumNonVectorTypes + NumVectorTypes
    };
 
 }

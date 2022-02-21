@@ -46,6 +46,7 @@ OMR::OpCodeProperties OMR::ILOpCode::_opCodeProperties[] =
 #include "il/ILOpCodeProperties.hpp"
    };
 
+// GITA
 void
 OMR::ILOpCode::checkILOpArrayLengths()
    {

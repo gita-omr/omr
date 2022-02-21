@@ -79,12 +79,15 @@
 #include "optimizer/TransformUtil.hpp"
 #include "ras/Debug.hpp"
 
-extern const SimplifierPtr simplifierOpts[];
 
-static_assert(TR::NumIlOps ==
-              (sizeof(simplifierOpts) / sizeof(simplifierOpts[0])),
-              "simplifierOpts is not the correct size");
+extern const SimplifierPtrTable simplifierOpts;
 
+void SimplifierPtrTable::checkTableSize()
+   {
+   static_assert((TR::NumIlOps + OMR::NumVectorOperations) ==
+              (sizeof(table) / sizeof(table[0])),
+              "SimplifierPtrTable::table is not the correct size");
+   }
 
 /*
  * Local helper functions

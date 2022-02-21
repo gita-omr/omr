@@ -72,4 +72,39 @@
 #include "il/Opcodes.enum"
 #undef OPCODE_MACRO
 
+
+#define VECTOR_OPERATION_MACRO(\
+   operation, \
+   name, \
+   prop1, \
+   prop2, \
+   prop3, \
+   prop4, \
+   dataType, \
+   typeProps, \
+   childProps, \
+   swapChildrenOpcode, \
+   reverseBranchOpcode, \
+   boolCompareOpcode, \
+   ifCompareOpcode, ...) \
+   \
+   { \
+   TR::BadILOp, \
+   name, \
+   prop1, \
+   prop2, \
+   prop3, \
+   prop4, \
+   dataType, \
+   typeProps, \
+   childProps, \
+   swapChildrenOpcode, \
+   reverseBranchOpcode, \
+   boolCompareOpcode, \
+   ifCompareOpcode, \
+   },
+
+#include "il/VectorOperations.enum"
+#undef VECTOR_OPERATION_MACRO
+
 #endif

@@ -266,4 +266,20 @@ TR::Node * arrayLengthSimplifier(TR::Node * node, TR::Block * block, TR::Simplif
 
 TR::Node * removeArithmeticsUnderIntegralCompare(TR::Node* node,TR::Simplifier * s);
 
+typedef TR::Node *(* SimplifierPtr)(TR::Node *node, TR::Block *block, TR::Simplifier *s);
+
+class SimplifierPtrTable
+   {
+   private:
+   static const SimplifierPtr table[];
+
+   static void checkTableSize();
+
+   public:
+   SimplifierPtr operator[] (TR::ILOpCode opcode) const
+      {
+      return table[opcode.getTableIndex()];
+      }
+   };
+
 #endif

@@ -631,6 +631,26 @@
    BadILOpSimplifierHandler,
 
 #include "il/Opcodes.enum"
+
+#define VECTOR_OPERATION_MACRO(\
+   operation, \
+   name, \
+   prop1, \
+   prop2, \
+   prop3, \
+   prop4, \
+   dataType, \
+   typeProps, \
+   childProps, \
+   swapChildrenOpcode, \
+   reverseBranchOpcode, \
+   boolCompareOpcode, \
+   ifCompareOpcode, \
+   ...) operation ## SimplifierHandler,
+
+#include "il/VectorOperations.enum"
+
 #undef OPCODE_MACRO
+#undef VECTOR_OPERATION_MACRO
 
 #endif

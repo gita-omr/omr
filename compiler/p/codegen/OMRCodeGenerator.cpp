@@ -1770,15 +1770,35 @@ bool OMR::Power::CodeGenerator::getSupportsOpCodeForAutoSIMD(TR::ILOpCode opcode
        dt != TR::Int64)
       return false;
 
+   if (opcode.isVectorOperation())
+      {
+      TR::DataType dt = opcode.getVectorResultDataType().getVectorElementType(); // GITA
+      TR::VectorLength length = opcode.getVectorResultDataType().getVectorLength();
+   
+      if (self()->comp()->target().cpu.isAtLeast(OMR_PROCESSOR_PPC_P8) &&
+          opcode.getVectorOperation() == OMR::vadd && dt == TR::Int64)
+         return true;
+
+      // implemented vector opcodes
+      switch (opcode.getVectorOperation())
+         {
+         case OMR::vadd:
+            if (dt == TR::Int8 || dt == TR::Int16 || dt == TR::Int32 || dt == TR::Float || dt == TR::Double)
+               return true;
+            else
+               return false;
+         }
+      return false;
+      }
+   
    if (self()->comp()->target().cpu.isAtLeast(OMR_PROCESSOR_PPC_P8) &&
-       (opcode.getOpCodeValue() == TR::vadd || opcode.getOpCodeValue() == TR::vsub || opcode.getOpCodeValue() == TR::vmul) &&
+       (opcode.getOpCodeValue() == TR::vsub || opcode.getOpCodeValue() == TR::vmul) &&
        dt == TR::Int64)
       return true;
 
    // implemented vector opcodes
    switch (opcode.getOpCodeValue())
       {
-      case TR::vadd:
       case TR::vsub:
       case TR::vmul:
          if (dt == TR::Int8 || dt == TR::Int16 || dt == TR::Int32 || dt == TR::Float || dt == TR::Double)

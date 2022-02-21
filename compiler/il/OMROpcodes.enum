@@ -6579,6 +6579,7 @@ OPCODE_MACRO(\
    /* .ifCompareOpCode      = */ TR::BadILOp, \
    /* .description          =    vector negation */ \
 )
+#if 0 // GITA
 OPCODE_MACRO(\
    /* .opcode               = */ vadd, \
    /* .name                 = */ "vadd", \
@@ -6595,6 +6596,7 @@ OPCODE_MACRO(\
    /* .ifCompareOpCode      = */ TR::BadILOp, \
    /* .description          =    vector add */ \
 )
+#endif
 OPCODE_MACRO(\
    /* .opcode               = */ vsub, \
    /* .name                 = */ "vsub", \

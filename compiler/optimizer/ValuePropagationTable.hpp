@@ -852,7 +852,9 @@ TR::Node * constrainLongBitCount(OMR::ValuePropagation *vp, TR::Node *node);
 #define BCDCHKVPHandler constrainBCDCHK
 #endif
 
-const ValuePropagationPtr constraintHandlers[] =
+const ValuePropagationPtrTable constraintHandlers;
+
+const ValuePropagationPtr ValuePropagationPtrTable::table[] =
    {
 #define OPCODE_MACRO(\
    opcode, \
@@ -874,6 +876,25 @@ const ValuePropagationPtr constraintHandlers[] =
 
 #include "il/Opcodes.enum"
 #undef OPCODE_MACRO
+
+#define VECTOR_OPERATION_MACRO(\
+   operation, \
+   name, \
+   prop1, \
+   prop2, \
+   prop3, \
+   prop4, \
+   dataType, \
+   typeProps, \
+   childProps, \
+   swapChildrenOpcode, \
+   reverseBranchOpcode, \
+   boolCompareOpcode, \
+   ifCompareOpcode, \
+   ...) operation ## VPHandler,
+
+#include "il/VectorOperations.enum"
+#undef VECTOR_OPERATION_MACRO
 
    };
 

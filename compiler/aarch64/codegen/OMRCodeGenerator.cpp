@@ -619,60 +619,53 @@ bool OMR::ARM64::CodeGenerator::getSupportsOpCodeForAutoSIMD(TR::ILOpCode opcode
    {
    // implemented vector opcodes
 
-   if (opcode.isVectorOpCode())
+   if (!opcode.isVectorOpCode())
+      return false;
+
+   TR::DataType ot = opcode.getVectorResultDataType();
+
+   if (ot.getVectorLength() != TR::VectorLength128) return false;
+
+   TR::DataType et = ot.getVectorElementType();
+
+   switch (opcode.getVectorOperation())
       {
-      TR::DataType ot = opcode.getVectorResultDataType();
-
-      if (ot.getVectorLength() != TR::VectorLength128) return false;
-
-      TR::DataType et = ot.getVectorElementType();
-
-      switch (opcode.getVectorOperation())
-         {
-         case OMR::vadd:
-            return true;
-         case OMR::vfma:
-            return (et == TR::Float || et == TR::Double);
-         default:
-            return false;
-         }
-      }
-
-   switch (opcode.getOpCodeValue())
-      {
-      case TR::vsub:
-      case TR::vneg:
-         if (dt == TR::Int8 || dt == TR::Int16 || dt == TR::Int32 || dt == TR::Int64 || dt == TR::Float || dt == TR::Double)
+      case OMR::vadd:
+      case OMR::vsub:
+      case OMR::vneg:
+         if (et == TR::Int8 || et == TR::Int16 || et == TR::Int32 || et == TR::Int64 || et == TR::Float || et == TR::Double)
             return true;
          else
             return false;
-      case TR::vmul:
-         if (dt == TR::Int8 || dt == TR::Int16 || dt == TR::Int32 || dt == TR::Int64 || dt == TR::Float || dt == TR::Double)
+      case OMR::vmul:
+         if (et == TR::Int8 || et == TR::Int16 || et == TR::Int32 || et == TR::Int64 || et == TR::Float || et == TR::Double)
             return true;
          else
             return false; // Int64 is not supported
-      case TR::vdiv:
-         if (dt == TR::Float || dt == TR::Double)
+      case OMR::vdiv:
+         if (et == TR::Float || et == TR::Double)
             return true;
          else
             return false; // Int8/ Int16/ Int32/ Int64 are not supported
-      case TR::vand:
-      case TR::vor:
-      case TR::vxor:
-      case TR::vnot:
-         if (dt == TR::Int8 || dt == TR::Int16 || dt == TR::Int32 || dt == TR::Int64)
+      case OMR::vand:
+      case OMR::vor:
+      case OMR::vxor:
+      case OMR::vnot:
+         if (et == TR::Int8 || et == TR::Int16 || et == TR::Int32 || et == TR::Int64)
             return true;
          else
             return false; // Float/ Double are not supported
-      case TR::vload:
-      case TR::vloadi:
-      case TR::vstore:
-      case TR::vstorei:
-      case TR::vsplats:
-         if (dt == TR::Int8 || dt == TR::Int16 || dt == TR::Int32 || dt == TR::Int64 || dt == TR::Float || dt == TR::Double)
+      case OMR::vload:
+      case OMR::vloadi:
+      case OMR::vstore:
+      case OMR::vstorei:
+      case OMR::vsplats:
+         if (et == TR::Int8 || et == TR::Int16 || et == TR::Int32 || et == TR::Int64 || et == TR::Float || et == TR::Double)
             return true;
          else
             return false;
+      case OMR::vfma:
+            return (et == TR::Float || dt == TR::Double);
       default:
          return false;
       }

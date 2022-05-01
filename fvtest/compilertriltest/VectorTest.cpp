@@ -29,11 +29,11 @@ TEST_F(VectorTest, VDoubleAdd) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorDouble offset=0                        "
+                     "     (vstoreiVector128Double  offset=0                          "
                      "         (aload parm=0)                                         "
                      "            (vaddVector128Double                                "
-                     "                 (vloadi type=VectorDouble (aload parm=1))      "
-                     "                 (vloadi type=VectorDouble (aload parm=2))))    "
+                     "                 (vloadiVector128Double (aload parm=1))         "
+                     "                 (vloadiVector128Double (aload parm=2))))       "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -64,11 +64,11 @@ TEST_F(VectorTest, VInt8Add) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorInt8 offset=0                          "
+                     "     (vstoreiVector128Int8 offset=0                             "
                      "         (aload parm=0)                                         "
                      "            (vaddVector128Int8                                  "
-                     "                 (vloadi type=VectorInt8 (aload parm=1))        "
-                     "                 (vloadi type=VectorInt8 (aload parm=2))))      "
+                     "                 (vloadiVector128Int8 (aload parm=1))           "
+                     "                 (vloadiVector128Int8 (aload parm=2))))         "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -102,11 +102,11 @@ TEST_F(VectorTest, VInt16Add) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorInt16 offset=0                         "
+                     "     (vstoreiVector128Int16 offset=0                            "
                      "         (aload parm=0)                                         "
                      "            (vaddVector128Int16                                 "
-                     "                 (vloadi type=VectorInt16 (aload parm=1))       "
-                     "                 (vloadi type=VectorInt16 (aload parm=2))))     "
+                     "                 (vloadiVector128Int16 (aload parm=1))          "
+                     "                 (vloadiVector128Int16 (aload parm=2))))        "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -140,11 +140,11 @@ TEST_F(VectorTest, VFloatAdd) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorFloat offset=0                         "
+                     "     (vstoreiVector128Float offset=0                            "
                      "         (aload parm=0)                                         "
                      "            (vaddVector128Float                                 "
-                     "                 (vloadi type=VectorFloat (aload parm=1))       "
-                     "                 (vloadi type=VectorFloat (aload parm=2))))     "
+                     "                 (vloadiVector128Float (aload parm=1))          "
+                     "                 (vloadiVector128Float (aload parm=2))))        "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -177,11 +177,11 @@ TEST_F(VectorTest, VInt8Sub) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorInt8 offset=0                          "
+                     "     (vstoreiVector128Int8 offset=0                             "
                      "         (aload parm=0)                                         "
-                     "            (vsub                                               "
-                     "                 (vloadi type=VectorInt8 (aload parm=1))        "
-                     "                 (vloadi type=VectorInt8 (aload parm=2))))      "
+                     "            (vsubVector128Int8                                  "
+                     "                 (vloadiVector128Int8 (aload parm=1))           "
+                     "                 (vloadiVector128Int8 (aload parm=2))))         "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -215,11 +215,11 @@ TEST_F(VectorTest, VInt16Sub) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorInt16 offset=0                         "
+                     "     (vstoreiVector128Int16 offset=0                            "
                      "         (aload parm=0)                                         "
-                     "            (vsub                                               "
-                     "                 (vloadi type=VectorInt16 (aload parm=1))       "
-                     "                 (vloadi type=VectorInt16 (aload parm=2))))     "
+                     "            (vsubVector128Int16                                 "
+                     "                 (vloadiVector128Int16 (aload parm=1))          "
+                     "                 (vloadiVector128Int16 (aload parm=2))))        "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -253,11 +253,11 @@ TEST_F(VectorTest, VFloatSub) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorFloat offset=0                         "
+                     "     (vstoreiVector128Float offset=0                            "
                      "         (aload parm=0)                                         "
-                     "            (vsub                                               "
-                     "                 (vloadi type=VectorFloat (aload parm=1))       "
-                     "                 (vloadi type=VectorFloat (aload parm=2))))     "
+                     "            (vsubVector128Float                                 "
+                     "                 (vloadiVector128Float (aload parm=1))          "
+                     "                 (vloadiVector128Float (aload parm=2))))        "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -290,11 +290,11 @@ TEST_F(VectorTest, VDoubleSub) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorDouble offset=0                        "
+                     "     (vstoreiVector128Double offset=0                           "
                      "         (aload parm=0)                                         "
-                     "            (vsub                                               "
-                     "                 (vloadi type=VectorDouble (aload parm=1))      "
-                     "                 (vloadi type=VectorDouble (aload parm=2))))    "
+                     "            (vsubVector128Double                                "
+                     "                 (vloadiVector128Double (aload parm=1))         "
+                     "                 (vloadiVector128Double (aload parm=2))))       "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -325,11 +325,11 @@ TEST_F(VectorTest, VInt8Mul) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorInt8 offset=0                          "
+                     "     (vstoreiVector128Int8 offset=0                             "
                      "         (aload parm=0)                                         "
-                     "            (vmul                                               "
-                     "                 (vloadi type=VectorInt8 (aload parm=1))        "
-                     "                 (vloadi type=VectorInt8 (aload parm=2))))      "
+                     "            (vmulVector128Int8                                  "
+                     "                 (vloadiVector128Int8 (aload parm=1))           "
+                     "                 (vloadiVector128Int8 (aload parm=2))))         "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -365,11 +365,11 @@ TEST_F(VectorTest, VInt16Mul) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorInt16 offset=0                         "
+                     "     (vstoreiVector128Int16 offset=0                            "
                      "         (aload parm=0)                                         "
-                     "            (vmul                                               "
-                     "                 (vloadi type=VectorInt16 (aload parm=1))       "
-                     "                 (vloadi type=VectorInt16 (aload parm=2))))     "
+                     "            (vmulVector128Int16                                 "
+                     "                 (vloadiVector128Int16 (aload parm=1))          "
+                     "                 (vloadiVector128Int16 (aload parm=2))))        "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -403,11 +403,11 @@ TEST_F(VectorTest, VFloatMul) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorFloat offset=0                         "
+                     "     (vstoreiVector128Float offset=0                            "
                      "         (aload parm=0)                                         "
-                     "            (vmul                                               "
-                     "                 (vloadi type=VectorFloat (aload parm=1))       "
-                     "                 (vloadi type=VectorFloat (aload parm=2))))     "
+                     "            (vmulVector128Float                                 "
+                     "                 (vloadiVector128Float (aload parm=1))          "
+                     "                 (vloadiVector128Float (aload parm=2))))        "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -440,11 +440,11 @@ TEST_F(VectorTest, VDoubleMul) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorDouble offset=0                        "
+                     "     (vstoreiVector128Double offset=0                           "
                      "         (aload parm=0)                                         "
-                     "            (vmul                                               "
-                     "                 (vloadi type=VectorDouble (aload parm=1))      "
-                     "                 (vloadi type=VectorDouble (aload parm=2))))    "
+                     "            (vmulVector128Double                                "
+                     "                 (vloadiVector128Double (aload parm=1))         "
+                     "                 (vloadiVector128Double (aload parm=2))))       "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -475,11 +475,11 @@ TEST_F(VectorTest, VFloatDiv) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorFloat offset=0                         "
+                     "     (vstoreiVector128Float offset=0                            "
                      "         (aload parm=0)                                         "
-                     "            (vdiv                                               "
-                     "                 (vloadi type=VectorFloat (aload parm=1))       "
-                     "                 (vloadi type=VectorFloat (aload parm=2))))     "
+                     "            (vdivVector128Float                                 "
+                     "                 (vloadiVector128Float (aload parm=1))          "
+                     "                 (vloadiVector128Float (aload parm=2))))        "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -512,11 +512,11 @@ TEST_F(VectorTest, VDoubleDiv) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorDouble offset=0                        "
+                     "     (vstoreiVector128Double offset=0                           "
                      "         (aload parm=0)                                         "
-                     "            (vdiv                                               "
-                     "                 (vloadi type=VectorDouble (aload parm=1))      "
-                     "                 (vloadi type=VectorDouble (aload parm=2))))    "
+                     "            (vdivVector128Double                                "
+                     "                 (vloadiVector128Double (aload parm=1))         "
+                     "                 (vloadiVector128Double (aload parm=2))))       "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -547,11 +547,11 @@ TEST_F(VectorTest, VInt8And) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorInt8 offset=0                          "
+                     "     (vstoreiVector128Int8 offset=0                             "
                      "         (aload parm=0)                                         "
-                     "            (vand                                               "
-                     "                 (vloadi type=VectorInt8 (aload parm=1))        "
-                     "                 (vloadi type=VectorInt8 (aload parm=2))))      "
+                     "            (vandVector128Int8                                  "
+                     "                 (vloadiVector128Int8 (aload parm=1))           "
+                     "                 (vloadiVector128Int8 (aload parm=2))))         "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -587,11 +587,11 @@ TEST_F(VectorTest, VInt8Or) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorInt8 offset=0                          "
+                     "     (vstoreiVector128Int8 offset=0                             "
                      "         (aload parm=0)                                         "
-                     "            (vor                                                "
-                     "                 (vloadi type=VectorInt8 (aload parm=1))        "
-                     "                 (vloadi type=VectorInt8 (aload parm=2))))      "
+                     "            (vorVector128Int8                                   "
+                     "                 (vloadiVector128Int8 (aload parm=1))           "
+                     "                 (vloadiVector128Int8 (aload parm=2))))         "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -627,11 +627,11 @@ TEST_F(VectorTest, VInt8Xor) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address,Address]           "
                      "  (block                                                        "
-                     "     (vstorei type=VectorInt8 offset=0                          "
+                     "     (vstoreiVector128Int8 offset=0                             "
                      "         (aload parm=0)                                         "
-                     "            (vxor                                               "
-                     "                 (vloadi type=VectorInt8 (aload parm=1))        "
-                     "                 (vloadi type=VectorInt8 (aload parm=2))))      "
+                     "            (vxorVector128Int8                                  "
+                     "                 (vloadiVector128Int8 (aload parm=1))           "
+                     "                 (vloadiVector128Int8 (aload parm=2))))         "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -667,10 +667,10 @@ TEST_F(VectorTest, VInt8Neg) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address]                   "
                      "  (block                                                        "
-                     "     (vstorei type=VectorInt8 offset=0                          "
+                     "     (vstoreiVector128Int8 offset=0                             "
                      "         (aload parm=0)                                         "
-                     "            (vneg                                               "
-                     "                 (vloadi type=VectorInt8 (aload parm=1))))      "
+                     "            (vnegVector128Int8                                  "
+                     "                 (vloadiVector128Int8 (aload parm=1))))         "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -703,10 +703,10 @@ TEST_F(VectorTest, VInt16Neg) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address]                   "
                      "  (block                                                        "
-                     "     (vstorei type=VectorInt16 offset=0                         "
+                     "     (vstoreiVector128Int16 offset=0                            "
                      "         (aload parm=0)                                         "
-                     "            (vneg                                               "
-                     "                 (vloadi type=VectorInt16 (aload parm=1))))     "
+                     "            (vnegVector128Int16                                 "
+                     "                 (vloadiVector128Int16 (aload parm=1))))        "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -739,10 +739,10 @@ TEST_F(VectorTest, VInt32Neg) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address]                   "
                      "  (block                                                        "
-                     "     (vstorei type=VectorInt32 offset=0                         "
+                     "     (vstoreiVector128Int32 offset=0                            "
                      "         (aload parm=0)                                         "
-                     "            (vneg                                               "
-                     "                 (vloadi type=VectorInt32 (aload parm=1))))     "
+                     "            (vnegVector128Int32                                 "
+                     "                 (vloadiVector128Int32 (aload parm=1))))        "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -775,10 +775,10 @@ TEST_F(VectorTest, VInt64Neg) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address]                   "
                      "  (block                                                        "
-                     "     (vstorei type=VectorInt64 offset=0                         "
+                     "     (vstoreiVector128Int64 offset=0                            "
                      "         (aload parm=0)                                         "
-                     "            (vneg                                               "
-                     "                 (vloadi type=VectorInt64 (aload parm=1))))     "
+                     "            (vnegVector128Int64                                 "
+                     "                 (vloadiVector128Int64 (aload parm=1))))        "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -811,10 +811,10 @@ TEST_F(VectorTest, VFloatNeg) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address]                   "
                      "  (block                                                        "
-                     "     (vstorei type=VectorFloat offset=0                         "
+                     "     (vstoreiVector128Float offset=0                            "
                      "         (aload parm=0)                                         "
-                     "            (vneg                                               "
-                     "                 (vloadi type=VectorFloat (aload parm=1))))     "
+                     "            (vnegVector128Float                                 "
+                     "                 (vloadiVector128Float (aload parm=1))))        "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -846,10 +846,10 @@ TEST_F(VectorTest, VDoubleNeg) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address]                   "
                      "  (block                                                        "
-                     "     (vstorei type=VectorDouble offset=0                        "
+                     "     (vstoreiVector128Double offset=0                           "
                      "         (aload parm=0)                                         "
-                     "            (vneg                                               "
-                     "                 (vloadi type=VectorDouble (aload parm=1))))    "
+                     "            (vnegVector128Double                                "
+                     "                 (vloadiVector128Double (aload parm=1))))       "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -879,10 +879,10 @@ TEST_F(VectorTest, VDoubleSQRT) {
 
     auto inputTrees = "(method return= NoType args=[Address,Address]                   "
                       "  (block                                                        "
-                      "     (vstorei type=VectorDouble offset=0                        "
+                      "     (vstoreiVector128Double offset=0                           "
                       "         (aload parm=0)                                         "
                       "            (vdsqrt                                             "
-                      "                 (vloadi type=VectorDouble (aload parm=1))))    "
+                      "                 (vloadiVector128Double (aload parm=1))))       "
                       "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);
@@ -913,10 +913,10 @@ TEST_F(VectorTest, VInt8Not) {
 
    auto inputTrees = "(method return= NoType args=[Address,Address]                   "
                      "  (block                                                        "
-                     "     (vstorei type=VectorInt8 offset=0                          "
+                     "     (vstoreiVector128Int8 offset=0                             "
                      "         (aload parm=0)                                         "
-                     "            (vnot                                               "
-                     "                 (vloadi type=VectorInt8 (aload parm=1))))      "
+                     "            (vnotVector128Int8                                  "
+                     "                 (vloadiVector128Int8 (aload parm=1))))         "
                      "     (return)))                                                 ";
 
     auto trees = parseString(inputTrees);

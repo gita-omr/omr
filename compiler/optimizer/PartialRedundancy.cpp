@@ -2063,9 +2063,10 @@ bool TR_PartialRedundancy::eliminateRedundantSupportedNodes(TR::Node *parent, TR
                      TR::Node *newLoad = TR::Node::createWithSymRef(node, comp()->il.opCodeForDirectLoad(node->getDataType()), 0, newSymbolReference);
 
                      TR::ILOpCodes conversionOpCode = TR::ILOpCode::getProperConversion(newLoad->getDataType(), node->getDataType(), false /* !wantZeroExtension */);
-                     if (conversionOpCode == TR::v2v)
+                     if (TR::ILOpCode::isVectorOpCode(conversionOpCode) &&
+                         TR::ILOpCode::getVectorOperation(conversionOpCode) == OMR::vcast)
                         {
-                        node = TR::Node::createVectorConversion(newLoad, node->getDataType());
+                        node = TR::Node::create(TR::ILOpCode::createVectorOpCode(OMR::vcast, newLoad->getDataType(), node->getDataType()), 1, newLoad);
                         }
                      else
                         {

@@ -1073,8 +1073,9 @@ TR::Node *OMR::LocalCSE::replaceCopySymbolReferenceByOriginalIn(TR::SymbolRefere
                rhsOfStoreDefNode,rhsOfStoreDefNode->getOpCode().getName(),node,node->getOpCode().getName());
 
             TR::Node *convNode = NULL;
-            if (convOp == TR::v2v)
-               convNode = TR::Node::createVectorConversion(rhsOfStoreDefNode, node->getDataType());
+            if (TR::ILOpCode::isVectorOpCode(convOp) &&
+                TR::ILOpCode::getVectorOperation(convOp) == OMR::vcast)
+               convNode = TR::Node::create(TR::ILOpCode::createVectorOpCode(OMR::vcast, rhsOfStoreDefNode->getDataType(), node->getDataType()), 1, rhsOfStoreDefNode);
             else
                convNode = TR::Node::create(convOp, 1, rhsOfStoreDefNode);
             rhsOfStoreDefNode->decReferenceCount();

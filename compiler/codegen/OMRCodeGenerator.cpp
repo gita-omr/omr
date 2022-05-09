@@ -157,6 +157,8 @@ OMR::TreeEvaluatorFunctionPointerTable::table[] =
    ifCompareOpcode, \
    ...) TR::TreeEvaluator::operation ## Evaluator,
 
+   TR::TreeEvaluator::BadILOpEvaluator,
+
 #include "il/VectorOperations.enum"
 #undef VECTOR_OPERATION_MACRO
    };

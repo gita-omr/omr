@@ -54,7 +54,7 @@ OMR::Linkage::argumentRegisterKind(TR::Node *argumentNode)
    {
    if (argumentNode->getOpCode().isFloatingPoint())
       return TR_FPR;
-   else if (argumentNode->getOpCode().isVector())
+   else if (argumentNode->getOpCode().isVectorResult())
       return TR_VRF;
    else
       return TR_GPR;

@@ -495,7 +495,7 @@ TR::Register *OMR::Power::TreeEvaluator::vsplatsEvaluator(TR::Node *node, TR::Co
    return NULL;
    }
 
-
+#if 0 // GITA
 TR::Register *OMR::Power::TreeEvaluator::vdgetelemEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    TR::Node *firstChild = node->getFirstChild();
@@ -545,9 +545,8 @@ TR::Register *OMR::Power::TreeEvaluator::vdgetelemEvaluator(TR::Node *node, TR::
    cg->decReferenceCount(secondChild);
 
    return resReg;
-
    }
-
+#endif
 
 TR::Register *OMR::Power::TreeEvaluator::vdsetelemEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
@@ -1732,13 +1731,13 @@ TR::Register *OMR::Power::TreeEvaluator::vRegLoadEvaluator(TR::Node *node, TR::C
 
    if (globalReg == NULL)
       {
-      if (node->getOpCode().getOpCodeValue() == TR::vbRegLoad ||
-          node->getOpCode().getOpCodeValue() == TR::vsRegLoad ||
-          node->getOpCode().getOpCodeValue() == TR::viRegLoad ||
-          node->getOpCode().getOpCodeValue() == TR::vlRegLoad)
+      if (node->getOpCode().getVectorResultDataType().getVectorElementType() == TR::Int8 ||
+          node->getOpCode().getVectorResultDataType().getVectorElementType() == TR::Int16 ||
+          node->getOpCode().getVectorResultDataType().getVectorElementType() == TR::Int32 ||
+          node->getOpCode().getVectorResultDataType().getVectorElementType() == TR::Int64)
          globalReg = cg->allocateRegister(TR_VRF);
-      else if (node->getOpCode().getOpCodeValue() == TR::vfRegLoad ||
-               node->getOpCode().getOpCodeValue() == TR::vdRegLoad)
+      else if (node->getOpCode().getVectorResultDataType().getVectorElementType() == TR::Float ||
+               node->getOpCode().getVectorResultDataType().getVectorElementType() == TR::Double)
          globalReg = cg->allocateRegister(TR_VSX_VECTOR);
       else
          TR_ASSERT(0, "unknown operation.\n");

@@ -1732,13 +1732,13 @@ TR::Register *OMR::Power::TreeEvaluator::vRegLoadEvaluator(TR::Node *node, TR::C
 
    if (globalReg == NULL)
       {
-      if (node->getOpCode().getOpCodeValue() == TR::vbRegLoad ||
-          node->getOpCode().getOpCodeValue() == TR::vsRegLoad ||
-          node->getOpCode().getOpCodeValue() == TR::viRegLoad ||
-          node->getOpCode().getOpCodeValue() == TR::vlRegLoad)
+      if (node->getOpCode().getResultVectorType().getVectorElementType() == TR::Int8 ||
+          node->getOpCode().getResultVectorType().getVectorElementType() == TR::Int16 ||
+          node->getOpCode().getResultVectorType().getVectorElementType() == TR::Int32 ||
+          node->getOpCode().getResultVectorType().getVectorElementType() == TR::Int64)
          globalReg = cg->allocateRegister(TR_VRF);
-      else if (node->getOpCode().getOpCodeValue() == TR::vfRegLoad ||
-               node->getOpCode().getOpCodeValue() == TR::vdRegLoad)
+      else if (node->getOpCode().getResultVectorType().getVectorElementType() == TR::Float ||
+               node->getOpCode().getResultVectorType().getVectorElementType() == TR::Double)
          globalReg = cg->allocateRegister(TR_VSX_VECTOR);
       else
          TR_ASSERT(0, "unknown operation.\n");

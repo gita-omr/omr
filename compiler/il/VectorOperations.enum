@@ -18,9 +18,88 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
-
 VECTOR_OPERATION_MACRO(\
-   /* .opcode               = */ vload, \
+   /* .operation            = */ vadd, \
+   /* .name                 = */ "vadd", \
+   /* .properties1          = */ ILProp1::Commutative | ILProp1::Associative | ILProp1::Add, \
+   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ ILTypeProp::Vector, \
+   /* .childProperties      = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    vector add */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation            = */ vand, \
+   /* .name                 = */ "vand", \
+   /* .properties1          = */ ILProp1::Commutative | ILProp1::Associative | ILProp1::And, \
+   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ ILTypeProp::Vector, \
+   /* .childProperties      = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    vector logical AND */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation            = */ vdiv, \
+   /* .name                 = */ "vdiv", \
+   /* .properties1          = */ ILProp1::Div, \
+   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ ILTypeProp::Vector, \
+   /* .childProperties      = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    vector divide */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation            = */ vfma, \
+   /* .name                 = */ "vfma", \
+   /* .properties1          = */ 0, \
+   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ ILTypeProp::Vector, \
+   /* .childProperties      = */ THREE_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    vector fused multiply and add */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation            = */ vindexVector, \
+   /* .name                 = */ "vindexVector", \
+   /* .properties1          = */ 0, \
+   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ ILTypeProp::Vector, \
+   /* .childProperties      = */ ILChildProp::Unspecified, \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    Add the lanes of this vector to their corresponding lane numbers, scaled by a given constant. */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation            = */ vload, \
    /* .name                 = */ "vload", \
    /* .properties1          = */ ILProp1::LoadVar | ILProp1::HasSymbolRef, \
    /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE| ILProp2::MayUseSystemStack, \
@@ -36,7 +115,7 @@ VECTOR_OPERATION_MACRO(\
    /* .description          =    load vector */ \
 )
 VECTOR_OPERATION_MACRO(\
-   /* .opcode               = */ vloadi, \
+   /* .operation            = */ vloadi, \
    /* .name                 = */ "vloadi", \
    /* .properties1          = */ ILProp1::LoadVar | ILProp1::Indirect | ILProp1::HasSymbolRef, \
    /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE| ILProp2::MayUseSystemStack, \
@@ -50,6 +129,150 @@ VECTOR_OPERATION_MACRO(\
    /* .booleanCompareOpCode = */ TR::BadILOp, \
    /* .ifCompareOpCode      = */ TR::BadILOp, \
    /* .description          =    load indirect vector */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation             = */ vmul, \
+   /* .name                 = */ "vmul", \
+   /* .properties1          = */ ILProp1::Commutative | ILProp1::Associative | ILProp1::Mul, \
+   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ ILTypeProp::Vector, \
+   /* .childProperties      = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    vector multiply */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation            = */ vneg, \
+   /* .name                 = */ "vneg", \
+   /* .properties1          = */ ILProp1::Neg, \
+   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3          = */ ILProp3::LikeUse, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ ILTypeProp::Vector, \
+   /* .childProperties      = */ ONE_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    vector negation */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation            = */ vnot, \
+   /* .name                 = */ "vnot", \
+   /* .properties1          = */ 0, \
+   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ ILTypeProp::Vector, \
+   /* .childProperties      = */ ONE_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    vector boolean not */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation            = */ vor, \
+   /* .name                 = */ "vor", \
+   /* .properties1          = */ ILProp1::Commutative | ILProp1::Associative | ILProp1::Or, \
+   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ ILTypeProp::Vector, \
+   /* .childProperties      = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    vector logical OR */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation            = */ vorUnchecked, \
+   /* .name                 = */ "vorUnchecked", \
+   /* .properties1          = */ ILProp1::Commutative | ILProp1::Associative | ILProp1::Or, \
+   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ ILTypeProp::Vector, \
+   /* .childProperties      = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    vector logical OR */ \
+)
+OPCODE_MACRO(\
+   /* .operation            = */ vRegLoad, \
+   /* .name                 = */ "vRegLoad", \
+   /* .properties1          = */ ILProp1::LoadReg, \
+   /* .properties2          = */ 0, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ ILTypeProp::Vector, \
+   /* .childProperties      = */ ILChildProp::NoChildren, \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    Load vector global register */ \
+)
+OPCODE_MACRO(\
+   /* .operation            = */ vRegStore, \
+   /* .name                 = */ "vRegStore", \
+   /* .properties1          = */ ILProp1::StoreReg | ILProp1::TreeTop, \
+   /* .properties2          = */ 0, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ ILTypeProp::Vector, \
+   /* .childProperties      = */ ONE_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    Store vector global register */ \
+)
+OPCODE_MACRO(\
+   /* .operation            = */ vselect, \
+   /* .name                 = */ "vselect", \
+   /* .properties1          = */ 0, \
+   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE | ILProp2::Select, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ , \
+   /* .childProperties      = */ THREE_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    vector select operator */ \
+)
+OPCODE_MACRO(\
+   /* .operation            = */ vsetelem, \
+   /* .name                 = */ "vsetelem", \
+   /* .properties1          = */ 0, \
+   /* .properties2          = */ ILProp2::ValueNumberShare, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ ILTypeProp::Vector, \
+   /* .childProperties      = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    vector set element */ \
 )
 VECTOR_OPERATION_MACRO(\
    /* .operation            = */ vstore, \
@@ -84,54 +307,6 @@ VECTOR_OPERATION_MACRO(\
    /* .description          =    store indirect vector */ \
 )
 VECTOR_OPERATION_MACRO(\
-   /* .operation            = */ vnot, \
-   /* .name                 = */ "vnot", \
-   /* .properties1          = */ 0, \
-   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
-   /* .properties3          = */ 0, \
-   /* .properties4          = */ 0, \
-   /* .dataType             = */ TR::NoType, \
-   /* .typeProperties       = */ ILTypeProp::Vector, \
-   /* .childProperties      = */ ONE_CHILD(ILChildProp::UnspecifiedChildType), \
-   /* .swapChildrenOpCode   = */ TR::BadILOp, \
-   /* .reverseBranchOpCode  = */ TR::BadILOp, \
-   /* .booleanCompareOpCode = */ TR::BadILOp, \
-   /* .ifCompareOpCode      = */ TR::BadILOp, \
-   /* .description          =    vector boolean not */ \
-)
-VECTOR_OPERATION_MACRO(\
-   /* .operation            = */ vneg, \
-   /* .name                 = */ "vneg", \
-   /* .properties1          = */ ILProp1::Neg, \
-   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
-   /* .properties3          = */ ILProp3::LikeUse, \
-   /* .properties4          = */ 0, \
-   /* .dataType             = */ TR::NoType, \
-   /* .typeProperties       = */ ILTypeProp::Vector, \
-   /* .childProperties      = */ ONE_CHILD(ILChildProp::UnspecifiedChildType), \
-   /* .swapChildrenOpCode   = */ TR::BadILOp, \
-   /* .reverseBranchOpCode  = */ TR::BadILOp, \
-   /* .booleanCompareOpCode = */ TR::BadILOp, \
-   /* .ifCompareOpCode      = */ TR::BadILOp, \
-   /* .description          =    vector negation */ \
-)
-VECTOR_OPERATION_MACRO(\
-   /* .operation            = */ vadd, \
-   /* .name                 = */ "vadd", \
-   /* .properties1          = */ ILProp1::Commutative | ILProp1::Associative | ILProp1::Add, \
-   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
-   /* .properties3          = */ 0, \
-   /* .properties4          = */ 0, \
-   /* .dataType             = */ TR::NoType, \
-   /* .typeProperties       = */ ILTypeProp::Vector, \
-   /* .childProperties      = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
-   /* .swapChildrenOpCode   = */ TR::BadILOp, \
-   /* .reverseBranchOpCode  = */ TR::BadILOp, \
-   /* .booleanCompareOpCode = */ TR::BadILOp, \
-   /* .ifCompareOpCode      = */ TR::BadILOp, \
-   /* .description          =    vector add */ \
-)
-VECTOR_OPERATION_MACRO(\
    /* .operation            = */ vsub, \
    /* .name                 = */ "vsub", \
    /* .properties1          = */ ILProp1::Sub, \
@@ -146,70 +321,6 @@ VECTOR_OPERATION_MACRO(\
    /* .booleanCompareOpCode = */ TR::BadILOp, \
    /* .ifCompareOpCode      = */ TR::BadILOp, \
    /* .description          =    vector subtract */ \
-)
-VECTOR_OPERATION_MACRO(\
-   /* .operation             = */ vmul, \
-   /* .name                 = */ "vmul", \
-   /* .properties1          = */ ILProp1::Commutative | ILProp1::Associative | ILProp1::Mul, \
-   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
-   /* .properties3          = */ 0, \
-   /* .properties4          = */ 0, \
-   /* .dataType             = */ TR::NoType, \
-   /* .typeProperties       = */ ILTypeProp::Vector, \
-   /* .childProperties      = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
-   /* .swapChildrenOpCode   = */ TR::BadILOp, \
-   /* .reverseBranchOpCode  = */ TR::BadILOp, \
-   /* .booleanCompareOpCode = */ TR::BadILOp, \
-   /* .ifCompareOpCode      = */ TR::BadILOp, \
-   /* .description          =    vector multiply */ \
-)
-VECTOR_OPERATION_MACRO(\
-   /* .operation            = */ vdiv, \
-   /* .name                 = */ "vdiv", \
-   /* .properties1          = */ ILProp1::Div, \
-   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
-   /* .properties3          = */ 0, \
-   /* .properties4          = */ 0, \
-   /* .dataType             = */ TR::NoType, \
-   /* .typeProperties       = */ ILTypeProp::Vector, \
-   /* .childProperties      = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
-   /* .swapChildrenOpCode   = */ TR::BadILOp, \
-   /* .reverseBranchOpCode  = */ TR::BadILOp, \
-   /* .booleanCompareOpCode = */ TR::BadILOp, \
-   /* .ifCompareOpCode      = */ TR::BadILOp, \
-   /* .description          =    vector divide */ \
-)
-VECTOR_OPERATION_MACRO(\
-   /* .operation            = */ vand, \
-   /* .name                 = */ "vand", \
-   /* .properties1          = */ ILProp1::Commutative | ILProp1::Associative | ILProp1::And, \
-   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
-   /* .properties3          = */ 0, \
-   /* .properties4          = */ 0, \
-   /* .dataType             = */ TR::NoType, \
-   /* .typeProperties       = */ ILTypeProp::Vector, \
-   /* .childProperties      = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
-   /* .swapChildrenOpCode   = */ TR::BadILOp, \
-   /* .reverseBranchOpCode  = */ TR::BadILOp, \
-   /* .booleanCompareOpCode = */ TR::BadILOp, \
-   /* .ifCompareOpCode      = */ TR::BadILOp, \
-   /* .description          =    vector logical AND */ \
-)
-VECTOR_OPERATION_MACRO(\
-   /* .operation            = */ vor, \
-   /* .name                 = */ "vor", \
-   /* .properties1          = */ ILProp1::Commutative | ILProp1::Associative | ILProp1::Or, \
-   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
-   /* .properties3          = */ 0, \
-   /* .properties4          = */ 0, \
-   /* .dataType             = */ TR::NoType, \
-   /* .typeProperties       = */ ILTypeProp::Vector, \
-   /* .childProperties      = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
-   /* .swapChildrenOpCode   = */ TR::BadILOp, \
-   /* .reverseBranchOpCode  = */ TR::BadILOp, \
-   /* .booleanCompareOpCode = */ TR::BadILOp, \
-   /* .ifCompareOpCode      = */ TR::BadILOp, \
-   /* .description          =    vector logical OR */ \
 )
 VECTOR_OPERATION_MACRO(\
    /* .operation            = */ vxor, \
@@ -228,22 +339,6 @@ VECTOR_OPERATION_MACRO(\
    /* .description          =    vector exclusive OR integer */ \
 )
 VECTOR_OPERATION_MACRO(\
-   /* .operation            = */ vfma, \
-   /* .name                 = */ "vfma", \
-   /* .properties1          = */ 0, \
-   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
-   /* .properties3          = */ 0, \
-   /* .properties4          = */ 0, \
-   /* .dataType             = */ TR::NoType, \
-   /* .typeProperties       = */ ILTypeProp::Vector, \
-   /* .childProperties      = */ THREE_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
-   /* .swapChildrenOpCode   = */ TR::BadILOp, \
-   /* .reverseBranchOpCode  = */ TR::BadILOp, \
-   /* .booleanCompareOpCode = */ TR::BadILOp, \
-   /* .ifCompareOpCode      = */ TR::BadILOp, \
-   /* .description          =    vector fused multiply and add */ \
-)
-VECTOR_OPERATION_MACRO(\
    /* .operation            = */ vsplats, \
    /* .name                 = */ "vsplats", \
    /* .properties1          = */ 0, \
@@ -258,4 +353,52 @@ VECTOR_OPERATION_MACRO(\
    /* .booleanCompareOpCode = */ TR::BadILOp, \
    /* .ifCompareOpCode      = */ TR::BadILOp, \
    /* .description          =    vector splats */ \
+)
+OPCODE_MACRO(\
+   /* .operation            = */ vfirstNonZero, \
+   /* .name                 = */ "vfirstNonZero", \
+   /* .properties1          = */ 0, \
+   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::Int32, \
+   /* .typeProperties       = */ TR::NoType, \
+   /* .childProperties      = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    get vector element */ \
+)
+OPCODE_MACRO(\
+   /* .operation            = */ vgetelem, \
+   /* .name                 = */ "vgetelem", \
+   /* .properties1          = */ 0, \
+   /* .properties2          = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::Int32, \
+   /* .typeProperties       = */ TR::NoType, \
+   /* .childProperties      = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    get vector element */ \
+)
+OPCODE_MACRO(\
+   /* .opcode               = */ vconv, \
+   /* .name                 = */ "vconv", \
+   /* .properties1          = */ ILProp1::Conversion, \
+   /* .properties2          = */ ILProp2::ValueNumberShare, \
+   /* .properties3          = */ 0, \
+   /* .properties4          = */ 0, \
+   /* .dataType             = */ TR::NoType, \
+   /* .typeProperties       = */ ILTypeProp::Vector, \
+   /* .childProperties      = */ ONE_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOpCode   = */ TR::BadILOp, \
+   /* .reverseBranchOpCode  = */ TR::BadILOp, \
+   /* .booleanCompareOpCode = */ TR::BadILOp, \
+   /* .ifCompareOpCode      = */ TR::BadILOp, \
+   /* .description          =    convert vector elements to a new type (not an noop) */ \
 )

@@ -37,21 +37,45 @@ namespace OMR
 
 enum VectorOperation
    {
+   vadd,
+   vand,
+   vdiv,
+   vfma,
+   vindexVector,
    vload,
    vloadi,
+   vmax,
+   vmin,
+   vmul,
+   vneg,
+   vnot,
+   vor,
+   vorUnchecked,
+   vRegload,
+   vRegstore,
+   vselect,  // bitwise blend
+   vsetelem,
+   vsplats,
    vstore,
    vstorei,
-   vnot,
-   vneg,
-   vadd,
    vsub,
-   vmul,
-   vdiv,
-   vand,
-   vor,
    vxor,
-   vfma,
-   vsplats,
+   lastVectorResultOperation = vxor,
+   vfirstNonZero,
+   vgetelem,
+   vreduce_add,
+   vreduce_and,
+   vreduce_firstNonZero,
+   vreduce_max,
+   vreduce_min,
+   vreduce_mul,
+   vreduce_or,
+   vreduce_orUnchecked,
+   vreduce_xor,
+   lastScalarResultOperation = vreduce_xor,
+   lastOneVectorTypeOperation = lastScalarResultOperation,
+   vconv,
+   lastTwoVectorTypeOperation = vconv, 
    NumVectorOperations
    };
 
@@ -92,9 +116,14 @@ public:
 
    // The class is capable of storing "hidden" vector opcodes and provides an interface
    // for creating and querying them
-   // Vector operations that return a non-vector type (e.g. reduction) or for which result
-   // and source types are different (e.g. conversion) will be handled later
-   static const int32_t NumAllIlOps = TR::NumScalarIlOps + NumVectorOperations*TR::NumVectorTypes;
+   static const int32_t NumOneVectorTypeOperations = lastOneVectorTypeOperation;
+   static const int32_t NumTwoVectorTypeOperations = lastTwoVectorTypeOperation - lastOneVectorTypeOperation;
+
+   static const int32_t NumOneVectorTypeOps = NumOneVectorTypeOperations*TR::NumVectorTypes;
+   static const int32_t NumTwoVectorTypeOps = NumTwoVectorTypeOperations*TR::NumVectorTypes*TR::NumVectorTypes;
+      
+   static const int32_t NumAllIlOps = TR::NumScalarIlOps + NumOneVectorTypeOps + NumTwoVectorTypeOps;
+                              
 
    // Deprecate?
    ILOpCode()
@@ -113,20 +142,51 @@ public:
    *  \param operation
    *     Vector operation
    *
-   *  \param resultVectorType
-   *     Type of the vector created by the operation
+   *  \param vectorType
+   *     Type of the vector which is either source or result (or both)
    *
    *  \return
    *     Vector opcode
    */
-   static TR::ILOpCodes createVectorOpCode(VectorOperation operation, DataType resultVectorType)
+   static TR::ILOpCodes createVectorOpCode(VectorOperation operation, DataType vectorType)
       {
       static_assert(NumAllIlOps < ((uint64_t)1 << (sizeof(TR::ILOpCodes)*8)), "Number of scalar and vector opcodes does not fit into TR::ILOpCodes\n");
 
-      TR_ASSERT_FATAL(resultVectorType.isVector(), "createVectorOpCode should take vector type\n");
+      TR_ASSERT_FATAL(vectorType.isVector(), "createVectorOpCode should take vector type\n");
 
-      return (TR::ILOpCodes)(TR::NumScalarIlOps + operation*TR::NumVectorTypes + (resultVectorType - TR::NumScalarTypes));
+      TR_ASSERT_FATAL(operation <= lastOneVectorTypeOperation, "Vector operation should be one vector type operation\n");
+
+      return (TR::ILOpCodes)(TR::NumScalarIlOps + operation*TR::NumVectorTypes + (vectorType - TR::NumScalarTypes));
       }
+
+  /** \brief
+   *     Creates vector opcode given vector operation and resulting vector type
+   *
+   *  \param operation
+   *     Vector operation
+   *
+   *  \param vectorType
+   *     Type of the vector which is either source or result (or both)
+   *
+   *  \return
+   *     Vector opcode
+   */
+   static TR::ILOpCodes createVectorOpCode(VectorOperation operation, DataType srcVectorType, DataType resVectorType)
+      {
+      static_assert(NumAllIlOps < ((uint64_t)1 << (sizeof(TR::ILOpCodes)*8)), "Number of scalar and vector opcodes does not fit into TR::ILOpCodes\n");
+
+      TR_ASSERT_FATAL(srcVectorType.isVector(), "createVectorOpCode should take vector source type\n");
+      TR_ASSERT_FATAL(resVectorType.isVector(), "createVectorOpCode should take vector result type\n");
+
+      TR_ASSERT_FATAL(operation > lastOneVectorTypeOperation &&
+                      operation <= lastTwoVectorTypeOperation, "Vector operation should be two vector type operation\n");
+
+      return (TR::ILOpCodes)(TR::NumScalarIlOps + NumOneVectorTypeOps +
+                             operation * TR::NumVectorTypes * TR::NumVectorTypes +
+                             (srcVectorType - TR::NumScalarTypes) * TR::NumVectorTypes +
+                             (resVectorType - TR::NumScalarTypes));
+      }
+   
 
   /** \brief
    *     Checks if the opcode represents vector operation
@@ -166,8 +226,7 @@ public:
    */
    VectorOperation getVectorOperation() const
       {
-      TR_ASSERT_FATAL(isVectorOpCode(), "getVectorOperation() can only be called on vector opcode\n");
-      return (VectorOperation)((_opCode - TR::NumScalarIlOps) / TR::NumVectorTypes);
+      return getVectorOperation(_opCode);
       }
 
   /** \brief
@@ -181,8 +240,13 @@ public:
    */
    static VectorOperation getVectorOperation(ILOpCode op)
       {
-      TR_ASSERT_FATAL(isVectorOpCode(op), "getVectorOperation() can only be called on vector opcode\n");
-      return (VectorOperation)((op._opCode - TR::NumScalarIlOps) / TR::NumVectorTypes);
+      TR_ASSERT_FATAL(isVectorOpCode(op), "getVectorOperation() can only be called for vector opcode\n");
+
+      TR::ILOpCodes opcode = op._opCode;
+
+      return (VectorOperation) opcode < (TR::NumScalarIlOps + NumOneVectorTypeOps) ?
+                               (opcode - TR::NumScalarIlOps) / TR::NumVectorTypes :
+                               (opcode - TR::NumScalarIlOps - NumOneVectorTypeOps) / (TR::NumVectorTypes * TR::NumVectorTypes);
       }
 
   /** \brief
@@ -193,8 +257,7 @@ public:
    */
    TR::DataType getVectorResultDataType() const
       {
-      TR_ASSERT_FATAL(isVectorOpCode(), "getVectorResultDataType() can only be called on vector opcode\n");
-      return (TR::DataTypes)((_opCode - TR::NumScalarIlOps) % TR::NumVectorTypes + TR::NumScalarTypes);
+      return getVectorResultDataType(_opcode);
       }
 
   /** \brief
@@ -208,10 +271,49 @@ public:
    */
    static TR::DataType getVectorResultDataType(ILOpCode op)
       {
-      TR_ASSERT_FATAL(isVectorOpCode(op), "getVectorResultDataType() can only be called on vector opcode\n");
-      return (TR::DataTypes)((op._opCode - TR::NumScalarIlOps) % TR::NumVectorTypes + TR::NumScalarTypes);
+      TR_ASSERT_FATAL(isVectorOpCode(op), "getVectorResultDataType() can only be called for vector opcode\n");
+
+      TR::ILOpCodes opcode = op._opCode;
+      
+      return (VectorOperation) (opcode < (TR::NumScalarIlOps + NumOneVectorTypeOps) ?
+                               (TR::DataTypes)((opcode - TR::NumScalarIlOps) % TR::NumVectorTypes + TR::NumScalarTypes) :
+                               (TR::DataTypes)(((opcode - TR::NumScalarIlOps - NumOneVectorTypeOps) %
+                                                 (TR::NumVectorTypes * TR::NumVectorTypes)) % TR::NumVectorTypes + TR::NumScalarTypes));
       }
 
+  /** \brief
+   *     Returns vector source type
+   *
+   *  \return
+   *     Vector type
+   */
+   TR::DataType getVectorSourceDataType() const
+      {
+      return getVectorSourceDataType(_opcode);
+      }
+
+  /** \brief
+   *     Returns source vector type
+   *
+   *  \param op
+   *     Opcode
+   *
+   *  \return
+   *     Vector type
+   */
+   static TR::DataType getVectorSourceDataType(ILOpCode op)
+      {
+      TR_ASSERT_FATAL(isVectorOpCode(op), "getVectorSourceDataType() can only be called on vector opcode\n");
+
+      TR::ILOpCodes opcode = op._opCode;
+
+      TR_ASSERT_FATAL(opcode >= (TR::NumScalarIlOps + NumOneVectorTypeOps), "getVectorSourceDataType() can only be called for two vector type opcodes (e.g. vconv)\n");
+      
+      return (VectorOperation) (TR::DataTypes)(((opcode - TR::NumScalarIlOps - NumOneVectorTypeOps) %
+                                                 (TR::NumVectorTypes * TR::NumVectorTypes)) / TR::NumVectorTypes + TR::NumScalarTypes));
+      }
+
+   
   /** \brief
    *     Returns index into OMR opcode properties and handler tables. All OMR tables contain VectorOperation
    *     entries following regular opcodes

@@ -982,73 +982,7 @@ OMR::Power::TreeEvaluator::vsetelemEvaluator(TR::Node *node, TR::CodeGenerator *
    }
 
 TR::Register*
-OMR::Power::TreeEvaluator::vbRegLoadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
-   {
-   return TR::TreeEvaluator::vRegLoadEvaluator(node, cg);
-   }
-
-TR::Register*
-OMR::Power::TreeEvaluator::vsRegLoadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
-   {
-   return TR::TreeEvaluator::vRegLoadEvaluator(node, cg);
-   }
-
-TR::Register*
-OMR::Power::TreeEvaluator::viRegLoadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
-   {
-   return TR::TreeEvaluator::vRegLoadEvaluator(node, cg);
-   }
-
-TR::Register*
-OMR::Power::TreeEvaluator::vlRegLoadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
-   {
-   return TR::TreeEvaluator::vRegLoadEvaluator(node, cg);
-   }
-
-TR::Register*
-OMR::Power::TreeEvaluator::vfRegLoadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
-   {
-   return TR::TreeEvaluator::vRegLoadEvaluator(node, cg);
-   }
-
-TR::Register*
-OMR::Power::TreeEvaluator::vdRegLoadEvaluator(TR::Node *node, TR::CodeGenerator *cg)
-   {
-   return TR::TreeEvaluator::vRegLoadEvaluator(node, cg);
-   }
-
-TR::Register*
-OMR::Power::TreeEvaluator::vbRegStoreEvaluator(TR::Node *node, TR::CodeGenerator *cg)
-   {
-   return TR::TreeEvaluator::fRegStoreEvaluator(node, cg);
-   }
-
-TR::Register*
-OMR::Power::TreeEvaluator::vsRegStoreEvaluator(TR::Node *node, TR::CodeGenerator *cg)
-   {
-   return TR::TreeEvaluator::fRegStoreEvaluator(node, cg);
-   }
-
-TR::Register*
-OMR::Power::TreeEvaluator::viRegStoreEvaluator(TR::Node *node, TR::CodeGenerator *cg)
-   {
-   return TR::TreeEvaluator::fRegStoreEvaluator(node, cg);
-   }
-
-TR::Register*
-OMR::Power::TreeEvaluator::vlRegStoreEvaluator(TR::Node *node, TR::CodeGenerator *cg)
-   {
-   return TR::TreeEvaluator::fRegStoreEvaluator(node, cg);
-   }
-
-TR::Register*
-OMR::Power::TreeEvaluator::vfRegStoreEvaluator(TR::Node *node, TR::CodeGenerator *cg)
-   {
-   return TR::TreeEvaluator::fRegStoreEvaluator(node, cg);
-   }
-
-TR::Register*
-OMR::Power::TreeEvaluator::vdRegStoreEvaluator(TR::Node *node, TR::CodeGenerator *cg)
+OMR::Power::TreeEvaluator::vRegStoreEvaluator(TR::Node *node, TR::CodeGenerator *cg)
    {
    return TR::TreeEvaluator::fRegStoreEvaluator(node, cg);
    }

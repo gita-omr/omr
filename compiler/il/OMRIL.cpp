@@ -700,18 +700,7 @@ OMR::IL::opCodeForRegisterLoad(TR::DataType dt)
    static_assert(TR::NumOMRTypes == (sizeof(OMR::IL::opCodesForRegisterLoad) / sizeof(OMR::IL::opCodesForRegisterLoad[0])),
               "OMR::IL::opCodesForRegisterLoad is not the correct size");
 
-   if (dt.isVector())
-      {
-      switch (dt.getVectorElementType())
-         {
-         case TR::Int8:   return TR::vbRegLoad;
-         case TR::Int16:  return TR::vsRegLoad;
-         case TR::Int32:  return TR::viRegLoad;
-         case TR::Int64:  return TR::vlRegLoad;
-         case TR::Float:  return TR::vfRegLoad;
-         case TR::Double: return TR::vdRegLoad;
-         }
-      }
+   if (dt.isVector()) return TR::ILOpCode::createVectorOpCode(OMR::vRegLoad, dt);
 
    TR_ASSERT(dt < TR::NumOMRTypes, "unexpected opcode");
 
@@ -724,18 +713,7 @@ OMR::IL::opCodeForRegisterStore(TR::DataType dt)
    static_assert(TR::NumOMRTypes == (sizeof(OMR::IL::opCodesForRegisterStore) / sizeof(OMR::IL::opCodesForRegisterStore[0])),
               "OMR::IL::opCodesForRegisterStore is not the correct size");
 
-   if (dt.isVector())
-      {
-      switch (dt.getVectorElementType())
-         {
-         case TR::Int8:   return TR::vbRegStore;
-         case TR::Int16:  return TR::vsRegStore;
-         case TR::Int32:  return TR::viRegStore;
-         case TR::Int64:  return TR::vlRegStore;
-         case TR::Float:  return TR::vfRegStore;
-         case TR::Double: return TR::vdRegStore;
-         }
-      }
+   if (dt.isVector()) return TR::ILOpCode::createVectorOpCode(OMR::vRegStore, dt);
 
    TR_ASSERT(dt < TR::NumOMRTypes, "unexpected opcode");
 

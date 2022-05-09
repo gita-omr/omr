@@ -223,9 +223,6 @@ public:
    static TR::Register *v2vEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *vconstEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *vsetelemEvaluator(TR::Node *node, TR::CodeGenerator *cg);
-   static TR::Register *vfRegLoadEvaluator(TR::Node *node, TR::CodeGenerator *cg);
-   static TR::Register *vdRegLoadEvaluator(TR::Node *node, TR::CodeGenerator *cg);
-   static TR::Register *vfRegStoreEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *f2iuEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *f2luEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *f2buEvaluator(TR::Node *node, TR::CodeGenerator *cg);
@@ -617,15 +614,8 @@ public:
    static TR::Register *vcallEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *vl2vdEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *getvelemEvaluator(TR::Node *node, TR::CodeGenerator *cg);
-   static TR::Register *vbRegLoadEvaluator(TR::Node *node, TR::CodeGenerator *cg);
-   static TR::Register *vsRegLoadEvaluator(TR::Node *node, TR::CodeGenerator *cg);
-   static TR::Register *viRegLoadEvaluator(TR::Node *node, TR::CodeGenerator *cg);
-   static TR::Register *vlRegLoadEvaluator(TR::Node *node, TR::CodeGenerator *cg);
-   static TR::Register *vbRegStoreEvaluator(TR::Node *node, TR::CodeGenerator *cg);
-   static TR::Register *vsRegStoreEvaluator(TR::Node *node, TR::CodeGenerator *cg);
-   static TR::Register *viRegStoreEvaluator(TR::Node *node, TR::CodeGenerator *cg);
-   static TR::Register *vlRegStoreEvaluator(TR::Node *node, TR::CodeGenerator *cg);
-   static TR::Register *vdRegStoreEvaluator(TR::Node *node, TR::CodeGenerator *cg);
+   static TR::Register *vRegLoadEvaluator(TR::Node *node, TR::CodeGenerator *cg);
+   static TR::Register *vRegStoreEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *d2iuEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *variableNewEvaluator(TR::Node *node, TR::CodeGenerator *cg);
    static TR::Register *multianewarrayEvaluator(TR::Node *node, TR::CodeGenerator *cg);

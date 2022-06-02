@@ -228,7 +228,7 @@ enum VectorLength
 #if defined(TR_TARGET_X86)
    NumVectorLengths = VectorLength512
 #else
-   NumVectorLengths = VectorLength128
+   NumVectorLengths = VectorLength512
 #endif
    };
 

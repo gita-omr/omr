@@ -127,6 +127,12 @@ public:
                              (resVectorType - TR::NumScalarTypes));
       }
 
+   bool isTwoTypeVectorOpCode()
+         {
+         if (!isVectorOpCode()) return false;
+
+         return (getVectorOperation() >= TR::firstTwoVectorTypeOperation);
+         }
 
   /** \brief
    *     Checks if the opcode represents vector operation

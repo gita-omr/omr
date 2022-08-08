@@ -121,7 +121,7 @@ void OMR::X86::Linkage::mapCompactedStack(TR::ResolvedMethodSymbol *method)
       igNode = self()->cg()->getLocalsIG()->getNodeTable(i);
       colour = igNode->getColour();
 
-      TR_ASSERT(colour != UNCOLOURED, "uncoloured local %p (igNode=%p) found in locals IG\n",
+      TR_ASSERT_FATAL(colour != UNCOLOURED, "uncoloured local %p (igNode=%p) found in locals IG\n",
               igNode->getEntity(), igNode);
 
       if ((colour != UNCOLOURED) &&
@@ -233,6 +233,8 @@ void OMR::X86::Linkage::mapCompactedStack(TR::ResolvedMethodSymbol *method)
    // Now map the rest of the locals
    //
    automaticIterator.reset();
+   int gita_count = 0;
+   
    for (localCursor = automaticIterator.getFirst(); localCursor; localCursor = automaticIterator.getNext())
       if (localCursor->getGCMapIndex() < 0)
          {
@@ -241,6 +243,12 @@ void OMR::X86::Linkage::mapCompactedStack(TR::ResolvedMethodSymbol *method)
             {
             IGNodeColour colour = igNode->getColour();
 
+            gita_count++;
+            
+            if (self()->cg()->comp()->getOption(TR_TraceCG))
+               traceMsg(self()->comp(), "GITA count=%d %p colour=%d\n", gita_count, localCursor, colour);
+
+                     
             if (colourToOffsetMap[colour] == -1)
                {
                self()->mapSingleAutomatic(localCursor, colourToSizeMap[colour], stackIndex);
@@ -251,7 +259,20 @@ void OMR::X86::Linkage::mapCompactedStack(TR::ResolvedMethodSymbol *method)
                }
             else
                {
-               localCursor->setOffset(colourToOffsetMap[colour]);
+#if 1
+               // GITA
+               bool performSharing = performTransformation(self()->comp(), "O^O GITA COMPACT LOCALS: Sharing slot for local %p\n", localCursor);
+
+               if (performSharing  && gita_count == 36)
+                  localCursor->setOffset(colourToOffsetMap[colour]);
+               else
+                  {
+                  self()->mapSingleAutomatic(localCursor, stackIndex);
+                  }
+#else
+
+               localCursor->setOffset(colourToOffsetMap[colour]);  // GITA
+#endif               
                }
 
 #ifdef DEBUG
@@ -293,7 +314,7 @@ void OMR::X86::Linkage::mapCompactedStack(TR::ResolvedMethodSymbol *method)
    else
       TR::toX86SystemLinkage(self()->cg()->getLinkage())->mapIncomingParms(method, stackIndex);
 
-   method->setLocalMappingCursor(stackIndex);
+   method->setLocalMappingCursor(stackIndex);  // GITA
 
    atlas->setLocalBaseOffset(lowGCOffset);
    atlas->setParmBaseOffset(atlas->getParmBaseOffset() + offsetToFirstParm);

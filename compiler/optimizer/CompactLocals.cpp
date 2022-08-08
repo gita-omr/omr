@@ -291,13 +291,14 @@ int32_t TR_CompactLocals::perform()
 
       if (trace())
          {
-         traceMsg(comp(), "Computed entry vector: ");
+         traceMsg(comp(), "_localsIG->getNumNodes() = %d Computed entry vector: ", _localsIG->getNumNodes());
          _liveVars->print(comp());
          traceMsg(comp(), "\nLiveness entry vector: ");
          liveLocals._blockAnalysisInfo[block->getNumber()]->print(comp());
          traceMsg(comp(), "\n");
          }
 
+      // GITA      
       TR_ASSERT(_localsIG->getNumNodes()>=MAX_NUMBER_OF_LOCALS || *_liveVars == *liveLocals._blockAnalysisInfo[block->getNumber()],
              "live-on-entry info does not match\n");
 
@@ -540,7 +541,7 @@ TR_CompactLocals::createInterferenceBetweenLocals(int32_t localIndex)
       }
    }
 
-
+// GITA
 bool TR_CompactLocals::eligibleLocal(TR::AutomaticSymbol * localSym)
    {
    if (localSym->getLiveLocalIndex() == INVALID_LIVENESS_INDEX)

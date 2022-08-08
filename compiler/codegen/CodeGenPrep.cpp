@@ -379,7 +379,7 @@ OMR::CodeGenerator::lowerTreeIfNeeded(
                IGNodeColour colourStore = storeIGNode->getColour();
                IGNodeColour colourLoad = loadIGNode->getColour();
 
-               if (colourLoad == colourStore && colourLoad != UNCOLOURED &&
+               if (colourLoad == colourStore && colourLoad != UNCOLOURED &&  0 && // GITA
                    performTransformation(self()->comp(), "%sCoalescing locals by removing store tree %p, load = %d, store = %d \n", OPT_DETAILS, node, colourLoad, colourStore))
                   {
                   // if we are removing the initialization of the store local, it will become uninitialized

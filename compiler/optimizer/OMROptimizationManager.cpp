@@ -260,7 +260,7 @@ void OMR::OptimizationManager::setRequested(bool requested, TR::Block *block)
    }
 
 
-void OMR::OptimizationManager::performChecks()
+void OMR::OptimizationManager::performChecks(bool transformed)
    {
 #if !defined(DISABLE_CFG_CHECK)
    LexicalTimer t("CFG_CHECK", self()->comp()->phaseTimer());
@@ -276,7 +276,9 @@ void OMR::OptimizationManager::performChecks()
          }
       else
          {
-         self()->comp()->verifyTrees(self()->comp()->getMethodSymbol());
+         bool assertFatal = (self()->id() == OMR::vectorAPIExpansion) && transformed;
+         
+         self()->comp()->verifyTrees(self()->comp()->getMethodSymbol(), bool assertFatal);
          }
       }
 

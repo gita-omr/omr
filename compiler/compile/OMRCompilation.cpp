@@ -2015,13 +2015,13 @@ void OMR::Compilation::validateIL(TR::ILValidationContext ilValidationContext)
    _ilValidator->validate(TR::omrValidationStrategies[ilValidationContext]);
    }
 
-void OMR::Compilation::verifyTrees(TR::ResolvedMethodSymbol *methodSymbol)
+void OMR::Compilation::verifyTrees(TR::ResolvedMethodSymbol *methodSymbol, bool assertFatal)
    {
    if (self()->getDebug() && !self()->getOption(TR_DisableVerification) && !self()->isPeekingMethod())
       {
       if (!methodSymbol)
          methodSymbol = _methodSymbol;
-      self()->getDebug()->verifyTrees(methodSymbol);
+      self()->getDebug()->verifyTrees(methodSymbol, assertFatal);
       }
    }
 

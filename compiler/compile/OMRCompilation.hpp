@@ -735,7 +735,7 @@ public:
    void setILValidator(TR::ILValidator *ilValidator) { _ilValidator = ilValidator; }
    void validateIL(TR::ILValidationContext ilValidationContext);
 
-   void verifyTrees(TR::ResolvedMethodSymbol *s = 0);
+   void verifyTrees(TR::ResolvedMethodSymbol *s = 0, bool assertFatal = false);
    void verifyBlocks(TR::ResolvedMethodSymbol *s = 0);
    void verifyCFG(TR::ResolvedMethodSymbol *s = 0);
 

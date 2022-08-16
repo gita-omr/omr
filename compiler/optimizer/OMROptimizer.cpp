@@ -2166,7 +2166,7 @@ int32_t OMR::Optimizer::performOptimization(const OptimizationStrategy *optimiza
          comp()->dumpMethodGraph(optIndex);
    #endif
 
-      manager->performChecks();
+      manager->performChecks(finalOptMsgIndex != origOptMsgIndex);
 
       static const bool enableCountTemps = feGetEnv("TR_EnableCountTemps") != NULL;
       if (enableCountTemps)

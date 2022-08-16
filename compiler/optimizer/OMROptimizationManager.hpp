@@ -128,7 +128,7 @@ class OMR_EXTENSIBLE OptimizationManager
 
    List<TR::Block> *getRequestedBlocks()                        { return &_requestedBlocks; }
 
-   void performChecks();
+   void performChecks(bool transformed);
 
    enum
       {

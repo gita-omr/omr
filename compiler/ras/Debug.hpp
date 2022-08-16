@@ -592,7 +592,7 @@ public:
 
    // Verification Passes
    //
-   virtual void         verifyTrees (TR::ResolvedMethodSymbol *s);
+   virtual void         verifyTrees (TR::ResolvedMethodSymbol *s, bool assertFatal = false);
    virtual void         verifyBlocks(TR::ResolvedMethodSymbol *s);
    virtual void         verifyCFG   (TR::ResolvedMethodSymbol *s);
 
@@ -773,7 +773,7 @@ public:
    void print(TR::FILE *, TR::GCRegisterMap *);
 
    void verifyTreesPass1(TR::Node *node);
-   void verifyTreesPass2(TR::Node *node, bool isTreeTop);
+   void verifyTreesPass2(TR::Node *node, bool isTreeTop, bool assertFatal);
    void verifyBlocksPass1(TR::Node *node);
    void verifyBlocksPass2(TR::Node *node);
    void verifyGlobalIndices(TR::Node * node, TR::Node **nodesByGlobalIndex);

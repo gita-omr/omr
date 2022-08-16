@@ -2250,7 +2250,7 @@ TR_Debug::verifyGlobalIndices(TR::Node * node, TR::Node **nodesByGlobalIndex)
    }
 
 void
-TR_Debug::verifyTrees(TR::ResolvedMethodSymbol *methodSymbol)
+TR_Debug::verifyTrees(TR::ResolvedMethodSymbol *methodSymbol, bool assertFatal)
    {
 #ifndef ASSUMES
    if (getFile() == NULL)
@@ -2272,7 +2272,7 @@ TR_Debug::verifyTrees(TR::ResolvedMethodSymbol *methodSymbol)
 
    _nodeChecklist.empty();
    for (tt = firstTree; tt; tt = tt->getNextTreeTop())
-      verifyTreesPass2(tt->getNode(), true);
+      verifyTreesPass2(tt->getNode(), true, assertFatal);
 
    // Disable verifyGlobalIndices() by default because the allocation below of
    // nodesByGlobalIndex exposes a leak in TR::Region / TR::SegmentProvider
@@ -2356,7 +2356,7 @@ TR_Debug::verifyTreesPass1(TR::Node *node)
    }
 
 void
-TR_Debug::verifyTreesPass2(TR::Node *node, bool isTreeTop)
+TR_Debug::verifyTreesPass2(TR::Node *node, bool isTreeTop, bool assertFatal)
    {
 
    // Verify the reference count. Pass 1 should have set the localIndex to the
@@ -2367,7 +2367,7 @@ TR_Debug::verifyTreesPass2(TR::Node *node, bool isTreeTop)
       _nodeChecklist.set(node->getGlobalIndex());
 
       for (int32_t i = node->getNumChildren() - 1; i >= 0; --i)
-         verifyTreesPass2(node->getChild(i), false);
+         verifyTreesPass2(node->getChild(i), false, assertFatal);
 
       if (isTreeTop)
          {
@@ -2395,7 +2395,12 @@ TR_Debug::verifyTreesPass2(TR::Node *node, bool isTreeTop)
          if (getFile() != NULL)
             trfprintf(getFile(), "TREE VERIFICATION ERROR -- node [%s] ref count is %d and should be %d\n",
                  getName(node), node->getReferenceCount(), node->getLocalIndex());
-         TR_ASSERT(debug("fixTrees"), "Tree verification error");
+
+         if (assertFatal)
+            TR_ASSERT_FATAL(debug("fixTrees"), "Tree verification error");
+         else
+           TR_ASSERT(debug("fixTrees"), "Tree verification error");
+
          // if there is logging, don't fix the ref count!
          if (getFile() == NULL)
             node->setReferenceCount(node->getLocalIndex());

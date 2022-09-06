@@ -2066,9 +2066,19 @@ void TR_LoopReplicator::fixUpLoopEntry(LoopInfo *lInfo, TR::Block *loopHeader)
    // rip out the trees from the original loop header
    loopHeader->getEntry()->join(loopHeader->getExit());
 
+   static char *applyFix = feGetEnv("TR_LoopReplicatorAsyncFix");
+   
    // add the async tree into the clonedHeader
    //
    TR::TreeTop *asyncTT = TR::TreeTop::create(comp(), TR::Node::createWithSymRef(bbstartNode, TR::asynccheck, 0, comp()->getSymRefTab()->findOrCreateAsyncCheckSymbolRef(comp()->getMethodSymbol())));
+
+if (!applyFix)
+   {
+   loopHeader->getEntry()->join(asyncTT);
+   asyncTT->join(loopHeader->getExit());
+   }
+else
+   {
    TR::TreeTop *clonedEntry = clonedHeader->getEntry();
    TR::TreeTop *clonedEntryNext = clonedEntry->getNextTreeTop();
 
@@ -2099,6 +2109,8 @@ void TR_LoopReplicator::fixUpLoopEntry(LoopInfo *lInfo, TR::Block *loopHeader)
          curTT = nextTT;
          }
       }
+   } // applyFix
+
    }
 
 // given a number, find the corresponding sub-node in the structure graph

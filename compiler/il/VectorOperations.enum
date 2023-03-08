@@ -1108,6 +1108,247 @@ VECTOR_OPERATION_MACRO(\
    /* .ifCompareOpCode         = */ TR::BadILOp, \
    /* .description             =    get vector element, returns scalar */ \
 )
+// new opcodes: will be sorted later
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vlshift, \
+   /* .name                    = */ "vlshift", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ 0, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::VectorResult, \
+   /* .childProperties         = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    vector lanewise left shift */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vrshift, \
+   /* .name                    = */ "vrshift", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ 0, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::VectorResult, \
+   /* .childProperties         = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    vector lanewise right shift */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vurshift, \
+   /* .name                    = */ "vurshift", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ 0, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::VectorResult, \
+   /* .childProperties         = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    vector lanewise unsigned right shift */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vbitCount, \
+   /* .name                    = */ "vbitCount", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ ILProp3::LikeUse, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::VectorResult, \
+   /* .childProperties         = */ ONE_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    vector lanewise bit count */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vlrotate, \
+   /* .name                    = */ "vlrotate", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ 0, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::VectorResult, \
+   /* .childProperties         = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    vector lanewise rotate left */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vrrotate, \
+   /* .name                    = */ "vrrotate", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ 0, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::VectorResult, \
+   /* .childProperties         = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    vector lanewise rotate right */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vcompress, \
+   /* .name                    = */ "vcompress", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ 0, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::VectorResult, \
+   /* .childProperties         = */ TWO_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    vector compress based on mask */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vexpand, \
+   /* .name                    = */ "vexpand", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ 0, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::VectorResult, \
+   /* .childProperties         = */ TWO_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    vector expand based on mask */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vmaskCompress, \
+   /* .name                    = */ "vmaskCompress", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ ILProp3::LikeUse, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::MaskResult, \
+   /* .childProperties         = */ ONE_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    mask compression */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vtzCount, \
+   /* .name                    = */ "vtzCount", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ ILProp3::LikeUse, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::VectorResult, \
+   /* .childProperties         = */ ONE_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    vector lanewise trailing zero count */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vlzCount, \
+   /* .name                    = */ "ltzCount", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ ILProp3::LikeUse, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::VectorResult, \
+   /* .childProperties         = */ ONE_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    vector lanewise leading zero count */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vreverse, \
+   /* .name                    = */ "vreverse", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ ILProp3::LikeUse, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::VectorResult, \
+   /* .childProperties         = */ ONE_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    vector lanewise reverse (Integer.reverse())*/ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vreverseBytes, \
+   /* .name                    = */ "vreverseBytes", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ ILProp3::LikeUse, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::VectorResult, \
+   /* .childProperties         = */ ONE_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    vector lanewise reverse bytes (Integer.reverseBytes()) */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vcompressBits, \
+   /* .name                    = */ "vcompressBits", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ 0, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::VectorResult, \
+   /* .childProperties         = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    vector lanewise compress bits (Integer.compress()) */ \
+)
+VECTOR_OPERATION_MACRO(\
+   /* .operation               = */ vexpandBits, \
+   /* .name                    = */ "vexpandBits", \
+   /* .properties1             = */ 0, \
+   /* .properties2             = */ ILProp2::ValueNumberShare | ILProp2::SupportedForPRE, \
+   /* .properties3             = */ 0, \
+   /* .properties4             = */ 0, \
+   /* .dataType                = */ TR::NoType, \
+   /* .typeProperties          = */ ILTypeProp::VectorResult, \
+   /* .childProperties         = */ TWO_SAME_CHILD(ILChildProp::UnspecifiedChildType), \
+   /* .swapChildrenOperation   = */ TR::vBadOperation, \
+   /* .reverseBranchOperation  = */ TR::vBadOperation, \
+   /* .booleanCompareOpCode    = */ TR::BadILOp, \
+   /* .ifCompareOpCode         = */ TR::BadILOp, \
+   /* .description             =    vector lanewise expand bits (Integer.expand()) */ \
+)
 //
 // masked one-type operations
 //

@@ -2823,7 +2823,7 @@ TR_Debug::print(TR::FILE *pOutFile, TR::list<TR::Snippet*> & snippetList)
       print(pOutFile, *snippets);
       }
 
-   if (_comp->cg()->hasDataSnippets())
+   if (_comp->cg()->hasDataSnippets())  // GITA1
       _comp->cg()->dumpDataSnippets(pOutFile);
    }
 
@@ -2840,7 +2840,7 @@ TR_Debug::print(TR::FILE *pOutFile, List<TR::Snippet> & snippetList)
       print(pOutFile, snippet);
       }
 
-   if (_comp->cg()->hasDataSnippets())
+   if (_comp->cg()->hasDataSnippets()) // GITA2
       _comp->cg()->dumpDataSnippets(pOutFile);
 
    trfprintf(pOutFile, "\n");
@@ -2867,6 +2867,8 @@ TR_Debug::getName(TR::Snippet *snippet)
 void
 TR_Debug::print(TR::FILE *pOutFile, TR::Snippet * snippet)
    {
+   trfprintf(pOutFile, "GITA1 %p\n", snippet->getSnippetLabel()->getCodeLocation());
+   
 #if defined(TR_TARGET_X86)
    if (_comp->target().cpu.isX86())
       {

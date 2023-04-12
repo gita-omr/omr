@@ -1460,14 +1460,14 @@ static uint8_t           *nextIntervalBufferPtr;
 static bool               segmentInBlock;
 #endif
 
-#if DEBUG
+//#if DEBUG
 void OMR::Power::CodeGenerator::dumpDataSnippets(TR::FILE *outFile)
    {
    if (outFile == NULL)
       return;
    _constantData->print(outFile);
    }
-#endif
+//#endif
 
 TR_BackingStore * OMR::Power::CodeGenerator::allocateStackSlot()
    {

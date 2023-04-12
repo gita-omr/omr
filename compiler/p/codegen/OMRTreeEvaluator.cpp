@@ -2276,7 +2276,7 @@ void loadFloatConstant(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic loadOp, T
             TR_ASSERT_FATAL_WITH_NODE(node, false, "Invalid data type %s in loadFloatConstant", TR::DataType::getName(type));
          }
 
-      if (tocOffset != PTOC_FULL_INDEX)
+      if (false /*tocOffset != PTOC_FULL_INDEX*/)  // GITA
          {
          TR::Register *tmpReg = NULL;
          TR::MemoryReference *memRef;
@@ -2313,7 +2313,18 @@ void loadFloatConstant(TR::CodeGenerator *cg, TR::InstOpCode::Mnemonic loadOp, T
 
    TR::Instruction *q[4];
 
+   if (TR::Options::getVerboseOption(TR_VerboseSnippetFootprint))
+      {
+      cg->generateDebugCounter(TR::DebugCounter::debugCounterName(cg->comp(), "GITA loadFloatConstant %7.2f",
+                                                                  type == TR::Float ? *reinterpret_cast<float*>(value)
+                                                                                    : *reinterpret_cast<double*>(value)));
+      }
+   
    fixedSeqMemAccess(cg, node, 0, q, trgReg, srcReg, loadOp, length, NULL, tmpReg);
+
+
+   traceMsg(cg->comp(), "GITA in loadFloatConstant\n");
+            
    cg->findOrCreateFloatConstant(value, type, q[0], q[1], q[2], q[3]);
 
    cg->stopUsingRegister(srcReg);
@@ -2339,6 +2350,13 @@ TR::Instruction *loadAddressConstantInSnippet(TR::CodeGenerator *cg, TR::Node * 
          isTmpRegLocal = true;
          }
 
+      if (TR::Options::getVerboseOption(TR_VerboseSnippetFootprint))
+         {
+         cg->generateDebugCounter(TR::DebugCounter::debugCounterName(cg->comp(),
+                                                                     "GITA loadAddressConstantInSnippet %p", address));
+
+         }
+      
       cursor = fixedSeqMemAccess(cg, node, 0, q, trgReg,  trgReg, opCode, sizeof(intptr_t), cursor, tempReg);
       cg->findOrCreateAddressConstant(&address, TR::Address, q[0], q[1], q[2], q[3], node, isUnloadablePicSite);
 

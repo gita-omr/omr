@@ -1239,6 +1239,10 @@ int32_t OMR::Compilation::compile()
       }
 #endif /* defined(LINUX) || defined(J9ZOS390) || defined(OMR_OS_WINDOWS) */
 
+   // GITA
+   traceMsg(self(), "GITA in OMR::Compilation::compile\n"); 
+   self()->cg()->getSnippetList();
+
    return COMPILATION_SUCCEEDED;
    }
 

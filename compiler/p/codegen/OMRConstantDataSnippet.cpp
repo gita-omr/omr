@@ -68,6 +68,9 @@ void OMR::ConstantDataSnippet::addConstantRequest(void              *v,
          PPCConstant<float>                 *fcursor=fiterator.getFirst();
 
          fin.fvalue = *(float *)v;
+
+         traceMsg(comp, "GITA adding float const %7.2f\n", fin.fvalue);
+         
          while (fcursor != NULL)
             {
             fex.fvalue = fcursor->getConstantValue();
@@ -358,7 +361,7 @@ uint32_t OMR::ConstantDataSnippet::getLength()
    }
 
 
-#if DEBUG
+//#if DEBUG
 void OMR::ConstantDataSnippet::print(TR::FILE *outFile)
    {
    if (outFile == NULL)
@@ -371,6 +374,9 @@ void OMR::ConstantDataSnippet::print(TR::FILE *outFile)
 
    trfprintf(outFile, "\n%08x\t\t\t\t\t; Constant Data", codeCursor-codeStart);
 
+   trfprintf(outFile, "\n GITA binary constant data snippet start %p\n", codeCursor);
+
+   
    ListIterator< PPCConstant<double> >  diterator(&_doubleConstants);
    PPCConstant<double>                 *dcursor=diterator.getFirst();
    while (dcursor != NULL)
@@ -410,4 +416,4 @@ void OMR::ConstantDataSnippet::print(TR::FILE *outFile)
       acursor = aiterator.getNext();
       }
    }
-#endif
+//#endif

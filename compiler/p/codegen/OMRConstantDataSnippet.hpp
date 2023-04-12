@@ -229,9 +229,9 @@ class ConstantDataSnippet
 
    TR::CodeGenerator *cg() {return _cg;}
 
-#ifdef DEBUG
+   //#ifdef DEBUG
    virtual void print(TR::FILE *outFile);
-#endif
+   //#endif
 
    };
 

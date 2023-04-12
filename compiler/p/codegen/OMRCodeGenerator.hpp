@@ -230,9 +230,9 @@ public:
 
    int32_t setEstimatedLocationsForDataSnippetLabels(int32_t estimatedSnippetStart);
 
-#ifdef DEBUG
+   //#ifdef DEBUG
    void dumpDataSnippets(TR::FILE *outFile);
-#endif
+   //#endif
 
    bool considerTypeForGRA(TR::Node *node);
    bool considerTypeForGRA(TR::DataType dt);

@@ -969,6 +969,10 @@ TR_Debug::printp(TR::FILE *pOutFile, TR::Snippet * snippet)
    {
    if (pOutFile == NULL)
       return;
+   // GITA
+
+   trfprintf(pOutFile, "\nLENGTH = %d", snippet->getLength(0));
+   
    switch (snippet->getKind())
       {
 #ifdef J9_PROJECT_SPECIFIC

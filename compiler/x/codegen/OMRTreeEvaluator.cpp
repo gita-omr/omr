@@ -3408,6 +3408,38 @@ TR::Register *OMR::X86::TreeEvaluator::BBStartEvaluator(TR::Node *node, TR::Code
       cg->generateCatchBlockBBStartPrologue(node, fence);
       }
 
+   if (block->isCold())
+      {
+      // GITA
+      const char *name = TR::DebugCounter::debugCounterName(comp,
+                                           "GITA_COLD_block_%d freq=%d %p (%s) (%s)",
+                                           block->getNumber(),
+                                           block->getFrequency(),                 
+                                           node,
+                                           comp->getHotnessName(cg->comp()->getMethodHotness()),
+                                           comp->signature());
+
+      cg->generateDebugCounter(name, 1, TR::DebugCounter::Free);
+
+      traceMsg(comp, "GITA: inserting COLD BLOCK DEBUG COUNTER\n");
+      }
+
+   if (comp->getMethodSymbol()->getFirstTreeTop()->getNode() == node)
+      {
+      // GITA
+      const char *name = TR::DebugCounter::debugCounterName(comp,
+                                           "GITA_FIRST_block_%d freq=%d %p (%s) (%s)",
+                                           block->getNumber(),
+                                           block->getFrequency(),                 
+                                           node,
+                                           comp->getHotnessName(cg->comp()->getMethodHotness()),
+                                           comp->signature());
+
+      cg->generateDebugCounter(name, 1, TR::DebugCounter::Free);
+
+      traceMsg(comp, "GITA: inserting FIRST BLOCK DEBUG COUNTER\n");
+      }
+   
    return NULL;
    }
 

@@ -1072,6 +1072,7 @@ enum TR_VerboseFlags
    TR_VerboseIProfilerPersistence,
    TR_VerboseCheckpointRestore,
    TR_VerboseCheckpointRestoreDetails,
+   TR_VerboseFootprint,
    //If adding new options add an entry to _verboseOptionNames as well
    TR_NumVerboseOptions        // Must be the last one;
    };

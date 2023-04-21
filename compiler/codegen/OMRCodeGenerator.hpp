@@ -1248,6 +1248,7 @@ public:
    //
    void emitDataSnippets() {}
    bool hasDataSnippets() {return false;}
+
    int32_t setEstimatedLocationsForDataSnippetLabels(int32_t estimatedSnippetStart) {return 0;}
 
    TR::list<TR::Snippet*> *getSnippetsToBePatchedOnClassUnload() { return &_snippetsToBePatchedOnClassUnload; }
@@ -1256,6 +1257,14 @@ public:
 
    TR::list<TR::Snippet*> *getSnippetsToBePatchedOnClassRedefinition() { return &_snippetsToBePatchedOnClassRedefinition; }
 
+   uint32_t getCodeSnippetsSize();
+
+   uint32_t getDataSnippetsSize() { return 0; }
+
+   uint32_t getOutOfLineCodeSize() { return 0; }
+
+   uint32_t getColdBlocksSize(uint32_t &allBlocksSize, uint32_t &sizeBeforeFirstBlock);
+   
    // --------------------------------------------------------------------------
    // Register pressure
    //

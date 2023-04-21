@@ -2646,7 +2646,7 @@ TR_Debug::dumpMixedModeDisassembly()
    TR::FILE *pOutFile = _comp->getOutFile();
    if (pOutFile == NULL)
       return;
-
+#if 0
    const char * title = "Mixed Mode Disassembly";
 
    trfprintf(pOutFile,"<instructions\n"
@@ -2673,8 +2673,9 @@ TR_Debug::dumpMixedModeDisassembly()
       print(pOutFile, inst);
       }
    trfprintf(pOutFile,"\n</instructions>\n");
-
-   trfprintf(pOutFile,"<snippets>");
+#endif
+   
+   trfprintf(pOutFile,"<snippets> %s", signature(_comp->getMethodSymbol())); // GITA
    print(pOutFile, _comp->cg()->getSnippetList());
    trfprintf(pOutFile,"\n</snippets>\n");
    }
@@ -5434,6 +5435,7 @@ void TR_Debug::printDebugCounters(TR::DebugCounterGroup *counterGroup, const cha
          counterArray[i] = NULL;
       }
 
+   fprintf(counterFile, "GITA TOTAL COUNTERS %d\n", count);
    for (i = 0; i < count; i++)
       {
       c = counterArray[i];

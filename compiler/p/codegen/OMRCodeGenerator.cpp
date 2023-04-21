@@ -944,15 +944,17 @@ bool OMR::Power::CodeGenerator::supportsInliningOfIsInstance()
    return !self()->comp()->getOption(TR_DisableInlineIsInstance);
    }
 
-bool OMR::Power::CodeGenerator::hasDataSnippets()
-   {
-   return (_constantData==NULL)?false:true;
-   }
+bool OMR::Power::CodeGenerator::hasDataSnippets() { return (_constantData==NULL)?false:true; }
 
 void OMR::Power::CodeGenerator::emitDataSnippets()
    {
    self()->setBinaryBufferCursor(_constantData->emitSnippetBody());
    }
+
+uint32_t OMR::Power::CodeGenerator::getDataSnippetsSize()
+   {
+   return hasDataSnippets() ? _constantData->getLength() : 0;
+   } 
 
 int32_t OMR::Power::CodeGenerator::setEstimatedLocationsForDataSnippetLabels(int32_t estimatedSnippetStart)
    {
@@ -1581,6 +1583,26 @@ TR_PPCOutOfLineCodeSection *OMR::Power::CodeGenerator::findOutLinedInstructionsF
 
    return NULL;
    }
+
+
+uint32_t OMR::Power::CodeGenerator::getOutOfLineCodeSize()
+   {
+   uint32_t totalSize = 0;
+   
+   auto oiIterator = self()->getPPCOutOfLineCodeSectionList().begin();
+   while (oiIterator != self()->getPPCOutOfLineCodeSectionList().end())
+      {
+      uint32_t startOffset = (*oiIterator)->getFirstInstruction()->getBinaryEncoding() - self()->getCodeStart();
+      uint32_t endOffset   = (*oiIterator)->getAppendInstruction()->getBinaryEncoding() - self()->getCodeStart();
+
+      totalSize += endOffset - startOffset;
+      
+      ++oiIterator;
+      }
+
+   return totalSize;
+   }
+
 
 TR::Snippet *OMR::Power::CodeGenerator::findSnippetInstructionsFromLabel(TR::LabelSymbol *label)
    {

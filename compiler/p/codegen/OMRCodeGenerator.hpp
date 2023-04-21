@@ -226,6 +226,8 @@ public:
    void emitDataSnippets();
    bool hasDataSnippets();
 
+   uint32_t getDataSnippetsSize();
+   
    TR::Instruction *generateSwitchToInterpreterPrePrologue(TR::Instruction *cursor, TR::Node *node);
 
    int32_t setEstimatedLocationsForDataSnippetLabels(int32_t estimatedSnippetStart);
@@ -455,6 +457,8 @@ public:
    // OutOfLineCodeSection List functions
    TR::list<TR_PPCOutOfLineCodeSection*> &getPPCOutOfLineCodeSectionList() {return _outOfLineCodeSectionList;}
    TR_PPCOutOfLineCodeSection *findOutLinedInstructionsFromLabel(TR::LabelSymbol *label);
+   uint32_t getOutOfLineCodeSize();
+
    TR::Snippet *findSnippetInstructionsFromLabel(TR::LabelSymbol *label);
 
    TR::Instruction *generateDebugCounterBump(TR::Instruction *cursor, TR::DebugCounterBase *counter, int32_t delta, TR::RegisterDependencyConditions *cond);

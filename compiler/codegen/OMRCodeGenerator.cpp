@@ -3390,3 +3390,99 @@ OMR::CodeGenerator::redoTrampolineReservationIfNecessary(TR::Instruction *callIn
       self()->fe()->reserveTrampolineIfNecessary(self()->comp(), calleeSymRef, true);
       }
    }
+
+
+
+uint32_t
+OMR::CodeGenerator::getCodeSnippetsSize()
+   {
+   uint32_t codeSnippetsSize = 0;
+   
+   TR::list<TR::Snippet*> snippetList = self()->getSnippetList();
+ 
+   for (auto snippets = snippetList.begin(); snippets != snippetList.end(); ++snippets)
+      codeSnippetsSize += (*snippets)->getLength(0);
+
+   return codeSnippetsSize;
+   }
+
+
+uint32_t
+OMR::CodeGenerator::getColdBlocksSize(uint32_t &allBlocksSize, uint32_t &sizeBeforeFirstBlock)
+   {
+   allBlocksSize = 0;
+   sizeBeforeFirstBlock = 0;
+   uint32_t coldBlocksSize = 0;
+   bool firstBlock = true;
+   static int const MAX_FREQ = 6;
+   uint32_t cold_frequence_size[MAX_FREQ] = {0};
+
+   const char *names[MAX_FREQ] = {
+     "UNKNOWN_COLD_BLOCK_COUNT",
+     "VERSIONED_COLD_BLOCK_COUNT",
+     "UNRESOLVED_COLD_BLOCK_COUNT",
+     "CATCH_COLD_BLOCK_COUNT",
+     "INTERP_CALLEE_COLD_BLOCK_COUNT",
+     "REVERSE_ARRAYCOPY_COLD_BLOCK_COUNT"
+   };
+
+   
+   for (TR::TreeTop *tt = self()->comp()->getMethodSymbol()->getFirstTreeTop(); tt ; tt = tt->getNextTreeTop())
+      {
+      TR::Node *node = tt->getNode();
+
+      TR::Block *block;
+      uint8_t *startCursor, *endCursor;
+      
+      if (node->getOpCodeValue() == TR::BBStart)
+         {
+         block = node->getBlock();
+         startCursor = block->getFirstInstruction()->getBinaryEncoding();
+         endCursor = block->getLastInstruction()->getBinaryEncoding();
+
+         uint32_t blockSize = endCursor - startCursor;
+         allBlocksSize += blockSize;
+
+         if (block->isCold())
+            {
+            coldBlocksSize += blockSize;
+            int32_t freq = block->getFrequency();  
+            
+            if (freq >= 0 && freq < MAX_FREQ) 
+               cold_frequence_size[freq] += blockSize;
+            }
+
+         if (firstBlock)
+            {
+            sizeBeforeFirstBlock = startCursor - self()->getCodeStart();
+            firstBlock = false;
+            }
+         }
+      }
+
+   uint32_t codeCacheSize = self()->getCodeEnd() - self()->getCodeStart();
+   uint32_t snippets = self()->getCodeSnippetsSize() + self()->getDataSnippetsSize();
+   uint32_t outOfLine = self()->getOutOfLineCodeSize();
+   int32_t  extra = codeCacheSize - allBlocksSize - sizeBeforeFirstBlock - outOfLine - snippets;
+
+   traceMsg(self()->comp(), "FOOTPRINT: METHOD      = %s\n", self()->comp()->signature());
+   traceMsg(self()->comp(), "FOOTPRINT: CODE CACHE  = %u\n", codeCacheSize);
+   traceMsg(self()->comp(), "FOOTPRINT: SNIPPETS    = %u\n", snippets);
+   traceMsg(self()->comp(), "FOOTPRINT: OUT OF LINE = %u\n", outOfLine);
+   traceMsg(self()->comp(), "FOOTPRINT: REGULAR BLOCKS  = %u\n", allBlocksSize - coldBlocksSize);
+   traceMsg(self()->comp(), "FOOTPRINT: COLD BLOCKS = %u\n", coldBlocksSize);
+   traceMsg(self()->comp(), "FOOTPRINT: PROLOGUE    = %u\n", sizeBeforeFirstBlock);
+   traceMsg(self()->comp(), "FOOTPRINT: EXTRA       = %d\n", extra);
+
+   uint32_t known_cold_blocks = 0;
+   for (int i = 0; i < MAX_FREQ; i++)
+      {
+      traceMsg(self()->comp(), "FOOTPRINT: COLD BLOCK TYPE: %s = %d\n", names[i], cold_frequence_size[i]);
+
+      known_cold_blocks += cold_frequence_size[i];
+      }
+
+   traceMsg(self()->comp(), "FOOTPRINT: COLD BLOCK TYPE: OTHER = %d\n", coldBlocksSize - known_cold_blocks);
+   
+   return coldBlocksSize;
+   }

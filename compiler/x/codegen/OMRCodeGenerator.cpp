@@ -2349,6 +2349,19 @@ void OMR::X86::CodeGenerator::emitDataSnippets()
       }
    }
 
+uint32_t OMR::X86::CodeGenerator::getDataSnippetsSize()
+   {
+   uint32_t length = 0;
+   
+   for (auto iterator = _dataSnippetList.begin(); iterator != _dataSnippetList.end(); ++iterator)
+      {
+      length +=(*iterator)->getLength(0);
+      }
+
+   return length;
+   }
+   
+
 TR::X86ConstantDataSnippet *OMR::X86::CodeGenerator::findOrCreate2ByteConstant(TR::Node * n, int16_t c)
    {
    return self()->findOrCreateConstantDataSnippet(n, &c, 2);

@@ -472,7 +472,8 @@ class OMR_EXTENSIBLE CodeGenerator : public OMR::CodeGenerator
    int32_t setEstimatedLocationsForDataSnippetLabels(int32_t estimatedSnippetStart);
    void emitDataSnippets();
    bool hasDataSnippets() { return _dataSnippetList.empty() ? false : true; }
-
+   uint32_t getDataSnippetsSize();
+   
    TR::list<TR::Register*> &getSpilledIntRegisters() {return _spilledIntRegisters;}
 
    TR::list<TR::Register*> &getLiveDiscardableRegisters() {return _liveDiscardableRegisters;}

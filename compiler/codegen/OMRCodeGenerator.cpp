@@ -206,6 +206,10 @@ OMR::CodeGenerator::CodeGenerator(TR::Compilation *comp) :
       _binaryBufferStart(NULL),
       _binaryBufferCursor(NULL),
       _largestOutgoingArgSize(0),
+      _warmCodeEnd(NULL),
+      _coldCodeStart(NULL),
+      _estimatedWarmCodeLength(0),
+      _estimatedColdCodeLength(0),
       _estimatedCodeLength(0),
       _estimatedSnippetStart(0),
       _accumulatedInstructionLengthError(0),
@@ -227,6 +231,7 @@ OMR::CodeGenerator::CodeGenerator(TR::Compilation *comp) :
       _globalFPRPartitionLimit(0),
       _firstInstruction(NULL),
       _appendInstruction(NULL),
+      _lastWarmInstruction(NULL),
       _firstGlobalVRF(-1),
       _lastGlobalVRF(-1),
       _firstOverlappedGlobalVRF(-1),
@@ -382,6 +387,10 @@ void OMR::CodeGenerator::lowerTrees()
    TR::TreeTop * tt;
    TR::Node * node;
 
+   TR::Block * block = NULL;
+   TR::Block * firstColdBlock = NULL, * firstColdExtendedBlock = NULL;
+   int32_t numColdBlocks = 0, numNonOutlinedColdBlocks = 0;
+
    vcount_t visitCount = self()->comp()->incVisitCount();
 
    for (tt = self()->comp()->getStartTree(); tt; tt = tt->getNextTreeTop())
@@ -390,6 +399,47 @@ void OMR::CodeGenerator::lowerTrees()
 
       TR_ASSERT(node->getVisitCount() != visitCount, "Code Gen: error in lowering trees");
       TR_ASSERT(node->getReferenceCount() == 0, "Code Gen: error in lowering trees");
+
+      if (node->getOpCodeValue() == TR::BBStart)
+         {
+         block = node->getBlock();
+
+         // If this is the first cold block, remember where the warm blocks ended.
+         // If it is a warm block and cold blocks have already been found, they
+         // are treated as warm.
+         //
+         if (block->isCold())
+            {
+            if (!firstColdBlock)
+               firstColdBlock = block;
+
+            numColdBlocks++;
+            }
+         else
+            {
+            firstColdBlock = NULL;
+            firstColdExtendedBlock = NULL;
+            numNonOutlinedColdBlocks = numColdBlocks;
+            }
+
+         if (!block->isExtensionOfPreviousBlock())
+            {
+            if (firstColdBlock &&
+                !firstColdExtendedBlock)
+               {
+               if (!block->getPrevBlock() ||
+                   !block->getPrevBlock()->canFallThroughToNextBlock())
+                  {
+                  firstColdExtendedBlock = block;
+                  }
+               else
+                  {
+                  firstColdBlock = NULL;
+                  numNonOutlinedColdBlocks = numColdBlocks;
+                  }
+               }
+            }
+         }
 
       self()->lowerTreesPreTreeTopVisit(tt, visitCount);
 
@@ -406,6 +456,106 @@ void OMR::CodeGenerator::lowerTrees()
       }
 
    self()->postLowerTrees();
+
+   if (comp()->getOption(TR_SplitWarmAndColdBlocks) &&
+       !comp()->compileRelocatableCode())
+      {
+      // Mark the split point between warm and cold blocks, so they can be
+      // allocated in different code sections.
+      //
+      TR::Block *lastWarmBlock;
+
+      if (firstColdExtendedBlock)
+         {
+         lastWarmBlock = firstColdExtendedBlock->getPrevBlock();
+
+         if (!lastWarmBlock)
+            {
+            // All the blocks are cold: insert a new goto block ahead of real blocks
+            //
+            lastWarmBlock = comp()->insertNewFirstBlock();
+            }
+         }
+      else
+         {
+         // All the blocks are warm - the split point is between the last
+         // instruction and the snippets.
+         //
+         lastWarmBlock = block;
+         }
+
+      lastWarmBlock->setIsLastWarmBlock();
+
+      if (comp()->getOption(TR_TraceCG))
+         {
+         traceMsg(comp(), "%s Last warm block is block_%d\n", SPLIT_WARM_COLD_STRING, lastWarmBlock->getNumber());
+
+         if (numColdBlocks > 0)
+            traceMsg(comp(), "%s Moved to cold code cache %d out of %d cold blocks (%d%%)\n",
+                              SPLIT_WARM_COLD_STRING,
+                              numColdBlocks - numNonOutlinedColdBlocks,
+                              numColdBlocks,
+                              (numColdBlocks - numNonOutlinedColdBlocks)*100/numColdBlocks);
+         }
+
+      // If the last tree in the last warm block is not a TR_goto, insert a goto tree
+      // at the end of the block.
+      // If there is a following block the goto will branch to it so that when the
+      // code is split any fall-through will go to the right place.
+      // If there is no following block the goto will branch to the first block; in
+      // this case the goto should never be reached, it is there only to
+      // make sure that the instruction following the last real treetop will be in
+      // warm code, so if it is a helper call (e.g. for a throw) the return address
+      // is in this method's code.
+      //
+      if (lastWarmBlock->getNumberOfRealTreeTops() == 0)
+         tt = lastWarmBlock->getEntry();
+      else
+         tt = lastWarmBlock->getLastRealTreeTop();
+
+      node = tt->getNode();
+
+      if (!(node->getOpCode().isGoto() ||
+            node->getOpCode().isJumpWithMultipleTargets() ||
+            node->getOpCode().isReturn()))
+         {
+         // Find the block to be branched to
+         //
+         TR::TreeTop * targetTreeTop = lastWarmBlock->getExit()->getNextTreeTop();
+
+         if (targetTreeTop)
+            // Branch to following block. Make sure it is not marked as an
+            // extension block so that it will get a label generated.
+            //
+            targetTreeTop->getNode()->getBlock()->setIsExtensionOfPreviousBlock(false);
+         else
+            // Branch to the first block. This will not be marked as an extension
+            // block.
+            //
+            targetTreeTop = comp()->getStartBlock()->getEntry();
+
+         // Generate the goto and insert it into the end of the last warm block.
+         //
+         TR::TreeTop *gotoTreeTop = TR::TreeTop::create(comp(), TR::Node::create(node, TR::Goto, 0, targetTreeTop));
+
+         // Move reg deps from BBEnd to goto
+         //
+         TR::Node *bbEnd = lastWarmBlock->getExit()->getNode();
+
+         if (bbEnd->getNumChildren() > 0)
+            {
+            TR::Node *glRegDeps = bbEnd->getChild(0);
+
+            gotoTreeTop->getNode()->setNumChildren(1);
+            gotoTreeTop->getNode()->setChild(0, glRegDeps);
+
+            bbEnd->setChild(0,NULL);
+            bbEnd->setNumChildren(0);
+            }
+
+         tt->insertAfter(gotoTreeTop);
+         }
+      }
    }
 
 

@@ -218,6 +218,9 @@ class OMR_EXTENSIBLE Instruction
    bool needsAOTRelocation() { return (_index & TO_MASK(NeedsAOTRelocation)) != 0; }
    void setNeedsAOTRelocation(bool v = true) { v ? _index |= TO_MASK(NeedsAOTRelocation) : _index &= ~TO_MASK(NeedsAOTRelocation); }
 
+   bool isLastWarmInstruction() { return (_index & TO_MASK(LastWarmInstruction)) != 0; }
+   void setLastWarmInstruction(bool v = true) { v ? _index |= TO_MASK(LastWarmInstruction) : _index &= ~TO_MASK(LastWarmInstruction); }
+
    TR_GCStackMap *getGCMap() { return _gc._GCMap; }
    TR_GCStackMap *setGCMap(TR_GCStackMap *map) { return (_gc._GCMap = map); }
    TCollectableReferenceMask getGCRegisterMask() { return _gc._GCRegisterMask; }

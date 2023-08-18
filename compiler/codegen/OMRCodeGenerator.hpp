@@ -399,6 +399,9 @@ public:
     */
    TR::Instruction *setAppendInstruction(TR::Instruction *ai) {return (_appendInstruction = ai);}
 
+   TR::Instruction *getLastWarmInstruction() {return _lastWarmInstruction;}
+   TR::Instruction *setLastWarmInstruction(TR::Instruction *instr) {return (_lastWarmInstruction = instr);}
+
    TR::TreeTop *getCurrentEvaluationTreeTop() {return _currentEvaluationTreeTop;}
    TR::TreeTop *setCurrentEvaluationTreeTop(TR::TreeTop *tt) {return (_currentEvaluationTreeTop = tt);}
 
@@ -778,8 +781,11 @@ public:
    // --------------------------------------------------------------------------
    // Binary encoding code cache
    //
-   uint32_t getEstimatedWarmLength()           {return _estimatedCodeLength;} // DEPRECATED
-   uint32_t setEstimatedWarmLength(uint32_t l) {return (_estimatedCodeLength = l);} // DEPRECATED
+   uint32_t getEstimatedWarmLength()           {return _estimatedWarmCodeLength;}
+   uint32_t setEstimatedWarmLength(uint32_t l) {return (_estimatedWarmCodeLength = l);}
+
+   uint32_t getEstimatedColdLength()           {return _estimatedColdCodeLength;}
+   uint32_t setEstimatedColdLength(uint32_t l) {return (_estimatedColdCodeLength = l);}
 
    uint32_t getEstimatedCodeLength()           {return _estimatedCodeLength;}
    uint32_t setEstimatedCodeLength(uint32_t l) {return (_estimatedCodeLength = l);}
@@ -790,6 +796,14 @@ public:
    uint8_t *getCodeStart();
    uint8_t *getCodeEnd()                  {return _binaryBufferCursor;}
    uint32_t getCodeLength();
+
+   uint8_t *getWarmCodeEnd()              {return _coldCodeStart ? _warmCodeEnd : _binaryBufferCursor;}
+   uint8_t *setWarmCodeEnd(uint8_t *c)    {return (_warmCodeEnd = c);}
+   uint8_t *getColdCodeStart()            {return _coldCodeStart;}
+   uint8_t *setColdCodeStart(uint8_t *c)  {return (_coldCodeStart = c);}
+
+   uint32_t getWarmCodeLength() {return (uint32_t)(getWarmCodeEnd() - getCodeStart());} // cast explicitly
+   uint32_t getColdCodeLength() {return (uint32_t)(_coldCodeStart ? getCodeEnd() - getColdCodeStart() : 0);} // cast explicitly
 
    uint8_t *getBinaryBufferCursor() {return _binaryBufferCursor;}
    uint8_t *setBinaryBufferCursor(uint8_t *b) { return (_binaryBufferCursor = b); }
@@ -1779,6 +1793,10 @@ public:
    void incOutOfLineColdPathNestedDepth(){_outOfLineColdPathNestedDepth++;}
    void decOutOfLineColdPathNestedDepth(){_outOfLineColdPathNestedDepth--;}
 
+   bool getIsInWarmCodeCache() {return _flags2.testAny(IsInWarmCodeCache);}
+   void setIsInWarmCodeCache() {_flags2.set(IsInWarmCodeCache);}
+   void resetIsInWarmCodeCache() {_flags2.reset(IsInWarmCodeCache);}
+
    bool getMethodModifiedByRA() {return _flags2.testAny(MethodModifiedByRA);}
    void setMethodModifiedByRA() {_flags2.set(MethodModifiedByRA);}
    void resetMethodModifiedByRA() {_flags2.reset(MethodModifiedByRA);}
@@ -1867,7 +1885,7 @@ public:
       // AVAILABLE                                        = 0x00400000,
       SupportsLoweringConstLDivPower2                     = 0x00800000,
       DisableFloatingPointGRA                             = 0x01000000,
-      // AVAILABLE                                        = 0x02000000,
+      IsInWarmCodeCache                                   = 0x02000000,
       MethodModifiedByRA                                  = 0x04000000,
       // AVAILABLE                                        = 0x08000000,
       // AVAILABLE                                        = 0x10000000,
@@ -2022,6 +2040,8 @@ public:
 
    uint32_t _largestOutgoingArgSize;
 
+   uint32_t _estimatedWarmCodeLength;
+   uint32_t _estimatedColdCodeLength;
    uint32_t _estimatedCodeLength;
    int32_t _estimatedSnippetStart;
    int32_t _accumulatedInstructionLengthError;
@@ -2041,6 +2061,7 @@ public:
 
    TR::Instruction *_firstInstruction;
    TR::Instruction *_appendInstruction;
+   TR::Instruction *_lastWarmInstruction;
 
    TR_RegisterMask _liveRealRegisters[NumRegisterKinds];
    TR_GlobalRegisterNumber _lastGlobalGPR;
@@ -2058,6 +2079,9 @@ public:
    uint8_t _globalGPRPartitionLimit;
    uint8_t _globalFPRPartitionLimit;
    flags16_t _enabledFlags;
+
+   uint8_t *_warmCodeEnd;
+   uint8_t *_coldCodeStart;
 
    public:
 
@@ -2113,5 +2137,7 @@ public:
    };
 
 }
+
+#define SPLIT_WARM_COLD_STRING  "SPLIT WARM AND COLD BLOCKS:"
 
 #endif

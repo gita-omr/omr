@@ -575,6 +575,8 @@ public:
 
    TR::list<TR::Snippet*> *getSnippetsToBePatchedOnClassRedefinition();
 
+   TR::Block *insertNewFirstBlock();
+
    TR::RegisterCandidates *getGlobalRegisterCandidates() { return _globalRegisterCandidates; }
    void setGlobalRegisterCandidates(TR::RegisterCandidates *t) { _globalRegisterCandidates = t; }
 

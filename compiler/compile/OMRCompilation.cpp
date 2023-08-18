@@ -2733,3 +2733,48 @@ OMR::Compilation::getSnippetsToBePatchedOnClassRedefinition()
    {
    return self()->cg()->getSnippetsToBePatchedOnClassRedefinition();
    }
+
+TR::Block *
+OMR::Compilation::insertNewFirstBlock()
+   {
+   TR::Node *oldBBStart = getStartTree()->getNode();
+   TR::Block *oldFirstBlock = getStartTree()->getNode()->getBlock();
+   TR::Node *glRegDeps=NULL;
+   if (oldBBStart->getNumChildren() == 1)
+      glRegDeps = oldBBStart->getChild(0);
+
+   TR::CFG *cfg = getFlowGraph();
+   TR::Compilation *comp = cfg->comp(); 
+   
+   TR::Block *newFirstBlock = TR::Block::createEmptyBlock(oldBBStart, comp, oldFirstBlock->getFrequency());
+   newFirstBlock->takeGlRegDeps(comp, glRegDeps);
+
+   cfg->addNode(newFirstBlock, (TR_RegionStructure *)cfg->getStructure());
+
+   cfg->join(newFirstBlock, oldFirstBlock);
+   //cfg->addEdge(new (trHeapMemory()) TR::CFGEdge(cfg->getStart(), newFirstBlock));
+
+   cfg->addEdge(cfg->getStart(), newFirstBlock);
+   
+   setStartTree(newFirstBlock->getEntry());
+
+   return newFirstBlock;
+   }
+
+#if 0
+TR::Block *
+OMR::ResolvedMethodSymbol::prependEmptyFirstBlock()
+   {
+   TR::Node * firstNode = self()->getFirstTreeTop()->getNode();
+   TR::Block * firstBlock = firstNode->getBlock();
+
+   TR::Block * newBlock = TR::Block::createEmptyBlock(firstNode, _flowGraph->comp(), firstBlock->getFrequency());
+   self()->setFirstTreeTop(newBlock->getEntry());
+
+   _flowGraph->insertBefore(newBlock, firstBlock);
+   _flowGraph->addEdge(_flowGraph->getStart(), newBlock);
+   _flowGraph->removeEdge(_flowGraph->getStart(), firstBlock);
+
+   return newBlock;
+   }
+#endif

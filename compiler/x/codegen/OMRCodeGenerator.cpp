@@ -98,11 +98,17 @@
 #include "x/codegen/X86Instruction.hpp"
 #include "codegen/InstOpCode.hpp"
 
+// Amount to be added to the estimated code size to ensure that there are long
+// branches between warm and cold code sections (must be multiple of 8 bytes).
+//
+#define MIN_DISTANCE_BETWEEN_WARM_AND_COLD_CODE 512
+
 namespace OMR { class RegisterUsage; }
 namespace TR { class RegisterDependencyConditions; }
 
 // Hack markers
 #define CANT_REMATERIALIZE_ADDRESSES(cg) (cg->comp()->target().is64Bit()) // AMD64 produces a memref with an unassigned addressRegister
+#define OVER_ESTIMATATION 4
 
 void TR_X86ProcessorInfo::reset()
    {
@@ -1883,6 +1889,7 @@ void OMR::X86::CodeGenerator::doBinaryEncoding()
 
    TR::Instruction * estimateCursor = self()->getFirstInstruction();
    int32_t estimate = 0;
+   int32_t warmEstimate = 0;
 
    // Estimate the binary length up to TR::InstOpCode::proc
    //
@@ -2023,6 +2030,22 @@ void OMR::X86::CodeGenerator::doBinaryEncoding()
       if (self()->comp()->getOption(TR_TraceCG))
          self()->getDebug()->dumpInstructionWithVFPState(estimateCursor, &prevState);
 
+      // If this is the last warm instruction, remember the estimated size up to
+      // this point and add a buffer to the estimated size so that branches
+      // between warm and cold instructions will be forced to be long branches.
+      // The size is rounded up to a multiple of 8 so that double-alignments in
+      // the cold section will have the same amount of padding for the estimate
+      // and the actual code allocation.
+      //
+      if (estimateCursor->isLastWarmInstruction())
+         {
+         // Estimate Warm Snippets.
+         estimate = setEstimatedLocationsForSnippetLabels(estimate);
+
+         warmEstimate = (estimate+7) & ~7;
+         estimate = warmEstimate + MIN_DISTANCE_BETWEEN_WARM_AND_COLD_CODE;
+         }
+      
       if (estimateCursor == _vfpResetInstruction)
          self()->generateDebugCounter(estimateCursor, "cg.prologues:#instructionBytes", estimate - estimatedPrologueStartOffset, TR::DebugCounter::Expensive);
 
@@ -2043,6 +2066,18 @@ void OMR::X86::CodeGenerator::doBinaryEncoding()
    #define OVER_ESTIMATION 4
    self()->setEstimatedCodeLength(estimate+OVER_ESTIMATION);
 
+   if (warmEstimate)
+      {
+      setEstimatedWarmLength(warmEstimate + OVER_ESTIMATATION);
+      setEstimatedColdLength(estimate-warmEstimate-MIN_DISTANCE_BETWEEN_WARM_AND_COLD_CODE+OVER_ESTIMATATION);
+      // self()->setEstimatedCodeLength(estimate+OVER_ESTIMATION);  // TODO: check if this is needed
+      }
+   else
+      {
+      setEstimatedWarmLength(estimate+OVER_ESTIMATATION);
+      setEstimatedColdLength(0);
+      }
+
    if (self()->comp()->getOption(TR_TraceCG))
       {
       traceMsg(self()->comp(), "</proepilogue>\n");
@@ -2059,7 +2094,9 @@ void OMR::X86::CodeGenerator::doBinaryEncoding()
       }
 
    uint8_t * coldCode = NULL;
-   uint8_t * temp = self()->allocateCodeMemory(self()->getEstimatedCodeLength(), 0, &coldCode);
+   uint8_t * temp = self()->allocateCodeMemory(self()->getEstimatedCodeLength(),
+                                               getEstimatedColdLength(),
+                                               &coldCode);
    TR_ASSERT(temp, "Failed to allocate primary code area.");
 
    if (self()->comp()->target().is64Bit() && self()->hasCodeCacheSwitched() && self()->getPicSlotCount() != 0)
@@ -2114,6 +2151,28 @@ void OMR::X86::CodeGenerator::doBinaryEncoding()
          }
 
       self()->addToAtlas(cursorInstruction);
+
+      // If this is the last warm instruction, save info about the warm code range
+      // and set up to generate code in the cold code range.
+      //
+      if (cursorInstruction->isLastWarmInstruction())
+         {
+         setWarmCodeEnd(getBinaryBufferCursor());
+         setColdCodeStart(coldCode);
+         setBinaryBufferCursor(coldCode);
+
+         if (self()->comp()->getOption(TR_TraceCG))
+            {
+            traceMsg(self()->comp(), "instr = %p starting cold cache = %p\n", cursorInstruction, coldCode);
+            traceMsg(self()->comp(), "WarmCodeEnd = %p\n", getWarmCodeEnd());
+            }
+         
+         // Adjust the accumulated length error so that distances within the cold
+         // code are calculated properly using the estimated code locations.
+         //
+         addAccumulatedInstructionLengthError(getWarmCodeEnd()-coldCode+MIN_DISTANCE_BETWEEN_WARM_AND_COLD_CODE); // TODO: check if this is correct
+         }
+      
       cursorInstruction = cursorInstruction->getNext();
       }
 

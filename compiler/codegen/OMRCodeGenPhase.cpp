@@ -251,8 +251,20 @@ OMR::CodeGenPhase::performEmitSnippetsPhase(TR::CodeGenerator * cg, TR::CodeGenP
    TR::LexicalMemProfiler mp("Emit Snippets", comp->phaseMemProfiler());
    LexicalTimer pt("Emit Snippets", comp->phaseTimer());
 
-   cg->emitSnippets();
-
+   if (comp->getOption(TR_SplitWarmAndColdBlocks))
+      {
+      // Snippets follow warm blocks
+      uint8_t * oldCursor = cg->getBinaryBufferCursor();
+      cg->setBinaryBufferCursor(cg->getWarmCodeEnd());
+      cg->emitSnippets();
+      cg->setWarmCodeEnd(cg->getBinaryBufferCursor());
+      cg->setBinaryBufferCursor(oldCursor);
+      }
+   else
+      {
+      cg->emitSnippets();
+      }
+   
    if (comp->getOption(TR_EnableOSR))
       {
       comp->getOSRCompilationData()->checkOSRLimits();

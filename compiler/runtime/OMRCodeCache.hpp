@@ -89,6 +89,8 @@ public:
    static TR::CodeCache *allocate(TR::CodeCacheManager *manager, size_t segmentSize, int32_t reservingCompThreadID);
    void destroy(TR::CodeCacheManager *manager);
 
+   void disclaim(TR::CodeCacheManager *manager);
+   
    uint8_t *allocateCodeMemory(size_t warmCodeSize,
                                size_t coldCodeSize,
                                uint8_t **coldCode,
@@ -406,6 +408,8 @@ public:
 
    uint8_t * _coldCodeAlloc;
 
+   uint8_t * _coldCodeAllocEnd;
+   
    TR::CodeCacheManager *_manager;
 
    TR::Monitor *_mutex;

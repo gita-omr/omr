@@ -151,6 +151,8 @@ public:
 
    void destroy();
 
+   void disclaimAllCodeCaches();
+
    // These two functions are for allocating Native backing memory for code cache structures
    // In future these facilities should probably be implemented via cs2 allocators
    void *getMemory(size_t sizeInBytes);

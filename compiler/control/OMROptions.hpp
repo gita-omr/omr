@@ -89,7 +89,7 @@ enum TR_CompilationOptions
    TR_ReportMethodExit           = 0x00000100,
    TR_EntryBreakPoints           = 0x00000200,
    TR_EnableOldEDO               = 0x00000400,
-   // Available                  = 0x00000800,
+   TR_DisclaimCodeCache          = 0x00000800,
    TR_RegisterMaps               = 0x00001000,
    TR_CreatePCMaps               = 0x00002000,
    TR_AggressiveInlining         = 0x00004000,
@@ -1072,6 +1072,7 @@ enum TR_VerboseFlags
    TR_VerboseIProfilerPersistence,
    TR_VerboseCheckpointRestore,
    TR_VerboseCheckpointRestoreDetails,
+   TR_VerboseFootprint,
    //If adding new options add an entry to _verboseOptionNames as well
    TR_NumVerboseOptions        // Must be the last one;
    };

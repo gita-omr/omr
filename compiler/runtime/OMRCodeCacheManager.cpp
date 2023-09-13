@@ -242,6 +242,20 @@ OMR::CodeCacheManager::destroy()
    _initialized = false;
    }
 
+
+void
+OMR::CodeCacheManager::disclaimAllCodeCaches()
+   {
+   TR::CodeCache *codeCache = self()->getFirstCodeCache();
+   while (codeCache != NULL)
+      {
+      TR::CodeCache *nextCache = codeCache->next();
+
+      codeCache->disclaim(self());
+      codeCache = nextCache;
+      }
+   }
+
 void *
 OMR::CodeCacheManager::getMemory(size_t sizeInBytes)
    {

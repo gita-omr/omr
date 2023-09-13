@@ -51,6 +51,12 @@
 #include <unistd.h>
 #endif
 
+#ifdef LINUX
+#include <sys/mman.h> // for madvise
+#endif
+
+#define DISCLAIM_PAGE_SIZE 4*1024
+
 namespace TR { class CodeGenerator; }
 
 /*****************************************************************************
@@ -145,6 +151,40 @@ OMR::CodeCache::destroy(TR::CodeCacheManager *manager)
       }
    }
 
+
+void
+OMR::CodeCache::disclaim(TR::CodeCacheManager *manager)
+   {
+   uint8_t *disclaim_start = _coldCodeAlloc;
+   size_t pageSize = DISCLAIM_PAGE_SIZE;
+   size_t round = pageSize - 1;
+   disclaim_start = (uint8_t *)(((size_t)(disclaim_start + round)) & ~round);
+   size_t disclaim_size = pageSize * ((_coldCodeAllocEnd - disclaim_start)/pageSize);
+   
+   bool trace = TR::Options::getCmdLineOptions()->getVerboseOption(TR_VerboseFootprint);
+
+   if (trace)
+      {
+      size_t warm_size = _warmCodeAlloc - _segment->segmentBase() + sizeof(this);
+      size_t cold_size = _coldCodeAllocEnd - _coldCodeAlloc;
+      
+      TR_VerboseLog::writeLine(TR_Vlog_PERF, "Disclaiming cache %p  coldStart=%p coldEnd=%p warm_size=%zuB cold_size=%zuB =%5.2f%%\n",
+                               this, _coldCodeAlloc, _coldCodeAllocEnd,
+                               warm_size, cold_size, cold_size * 100.0/warm_size
+                               );
+      }
+
+   if (madvise((void *)disclaim_start, disclaim_size, MADV_PAGEOUT) != 0)
+      {
+      if (trace)
+         TR_VerboseLog::writeLine(TR_Vlog_PERF, "Failed to use madvise to disclaim memory for code cache");
+      }
+   else
+      {
+      if (trace)
+         TR_VerboseLog::writeLine(TR_Vlog_PERF, "Disclaimed page at %p", disclaim_start);
+      }
+   }
 
 
 uint8_t *
@@ -414,6 +454,7 @@ OMR::CodeCache::initialize(TR::CodeCacheManager *manager,
    size_t spaceLost = (_warmCodeAlloc - _segment->segmentBase()) + (_segment->segmentTop() - _trampolineBase);
    _manager->increaseCurrTotalUsedInBytes(spaceLost);
 
+
    // Now that we have initialized the code cache, (including _warmCodeAlloc and _coldCodeAlloc)
    // write a pointer to this cache at the beginning of the segment
    VM_AtomicSupport::writeBarrier();
@@ -421,6 +462,22 @@ OMR::CodeCache::initialize(TR::CodeCacheManager *manager,
    *((TR::CodeCache **)(_segment->segmentBase())) = self();
    omrthread_jit_write_protect_enable();
 
+   uint8_t *middle  = _warmCodeAlloc + (_coldCodeAlloc - _warmCodeAlloc) / 2;
+   size_t round = DISCLAIM_PAGE_SIZE - 1;
+
+   middle = (uint8_t *)(((size_t)(middle + round)) & ~round);
+   
+   if (madvise(middle, _coldCodeAlloc - middle, MADV_NOHUGEPAGE) != 0)
+      {
+      if (TR::Options::getCmdLineOptions()->getVerboseOption(TR_VerboseFootprint))
+         TR_VerboseLog::writeLine(TR_Vlog_INFO, "Failed to set MADV_NOHUGEPAGE for code cache");
+      }
+
+   if (TR::Options::getCmdLineOptions()->getVerboseOption(TR_VerbosePerformance))
+         TR_VerboseLog::writeLine(TR_Vlog_INFO, "Small pages starting from %p\n", middle);
+
+   _coldCodeAllocEnd = _coldCodeAlloc; 
+   
    return true;
    }
 
@@ -1569,7 +1626,7 @@ OMR::CodeCache::allocateCodeMemory(size_t warmCodeSize,
       if (coldSize)
          coldIsFreeBlock = _sizeOfLargestFreeColdBlock >= coldSize;
       }
-
+   
    // We want to avoid the case where we allocate the warm portion and then
    // discover that we cannot allocate the cold portion and switch to
    // another code cache. Therefore, lets make sure that we can allocate
@@ -1678,6 +1735,17 @@ OMR::CodeCache::allocateCodeMemory(size_t warmCodeSize,
       *coldCode = coldCodeAddress;
    else
       *coldCode = warmCodeAddress;
+
+   if (TR::Options::getCmdLineOptions()->getVerboseOption(TR_VerboseFootprint))
+      {
+      size_t warm_size = _warmCodeAlloc - _segment->segmentBase() + sizeof(this);
+      size_t cold_size = _coldCodeAllocEnd - _coldCodeAlloc;
+      
+      TR_VerboseLog::writeLine(TR_Vlog_PERF, "OMR::CodeCache::allocateCodeMemory: cache %p coldStart=%p coldEnd=%p warm_size=%zu cold_size=%zu  =%5.2f%%\n",
+                               this, _coldCodeAlloc, _coldCodeAllocEnd,
+                               warm_size, cold_size, cold_size * 100.0/warm_size);
+      }
+   
    return warmCodeAddress;
    }
 

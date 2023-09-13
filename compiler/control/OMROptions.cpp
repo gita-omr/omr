@@ -610,6 +610,7 @@ TR::OptionTable OMR::Options::_jitOptions[] = {
    {"disableZImplicitNullChecks",         "O\tdisable implicit null checks on 390",            SET_OPTION_BIT(TR_DisableZImplicitNullChecks), "F"},
    {"disableZNext",                       "O\tdisable zNext support",                        SET_OPTION_BIT(TR_DisableZNext), "F"},
    {"disclaimMemoryOnSwap",               "M\tuse swap file as a backup for disclaimed memory (linux only).", SET_OPTION_BIT(TR_DisclaimMemoryOnSwap),"F", NOT_IN_SUBSET},
+   {"disclaimCodeCache",                  "M\tdisclaim code cache",                            SET_OPTION_BIT(TR_DisclaimCodeCache),"F", NOT_IN_SUBSET},
    {"dltMostOnce",                        "O\tprevent DLT compilation of a method at more than one bytecode index.", SET_OPTION_BIT(TR_DLTMostOnce), "F"},
    {"dltOptLevel=cold",                   "O\tforce DLT compilation at cold level",            TR::Options::set32BitValue, offsetof(OMR::Options, _dltOptLevel), cold, "P"},
    {"dltOptLevel=hot",                    "O\tforce DLT compilation at hot level",             TR::Options::set32BitValue, offsetof(OMR::Options, _dltOptLevel), hot, "P"},
@@ -4961,7 +4962,8 @@ const char *OMR::Options::_verboseOptionNames[TR_NumVerboseOptions] =
    "vectorAPI",
    "iprofilerPersistence",
    "CheckpointRestore",
-   "CheckpointRestoreDetails"
+   "CheckpointRestoreDetails",
+   "Footprint"
    };
 
 

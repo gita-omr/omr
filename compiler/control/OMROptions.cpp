@@ -1855,6 +1855,10 @@ OMR::Options::Options(
       self()->setOption(TR_DisableCHOpts);
       }
 
+   self()->setOption(TR_SplitWarmAndColdBlocks);
+   self()->setOption(TR_DisclaimCodeCache);
+   self()->setVerboseOption(TR_VerboseFootprint);
+   
    // preexistence is based on CHTable, so if we don't want to use CHTable,
    // don't use preexistence either
    //

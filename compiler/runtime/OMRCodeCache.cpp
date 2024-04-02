@@ -51,8 +51,12 @@
 #include <unistd.h>
 #endif
 
+// for madvise
 #ifdef LINUX
-#include <sys/mman.h> // for madvise
+#include <sys/mman.h>
+#ifndef MADV_PAGEOUT
+#define MADV_PAGEOUT     21
+#endif
 #endif
 
 #define DISCLAIM_PAGE_SIZE 4*1024
@@ -155,6 +159,7 @@ OMR::CodeCache::destroy(TR::CodeCacheManager *manager)
 void
 OMR::CodeCache::disclaim(TR::CodeCacheManager *manager)
    {
+#ifdef LINUX   
    uint8_t *disclaim_start = _coldCodeAlloc;
    size_t pageSize = DISCLAIM_PAGE_SIZE;
    size_t round = pageSize - 1;
@@ -184,6 +189,7 @@ OMR::CodeCache::disclaim(TR::CodeCacheManager *manager)
       if (trace)
          TR_VerboseLog::writeLine(TR_Vlog_PERF, "Disclaimed page at %p", disclaim_start);
       }
+#endif // ifdef LINUX 
    }
 
 
@@ -462,6 +468,7 @@ OMR::CodeCache::initialize(TR::CodeCacheManager *manager,
    *((TR::CodeCache **)(_segment->segmentBase())) = self();
    omrthread_jit_write_protect_enable();
 
+#ifdef LINUX   
    uint8_t *middle  = _warmCodeAlloc + (_coldCodeAlloc - _warmCodeAlloc) / 2;
    size_t round = DISCLAIM_PAGE_SIZE - 1;
 
@@ -473,9 +480,10 @@ OMR::CodeCache::initialize(TR::CodeCacheManager *manager,
          TR_VerboseLog::writeLine(TR_Vlog_INFO, "Failed to set MADV_NOHUGEPAGE for code cache");
       }
 
-   if (TR::Options::getCmdLineOptions()->getVerboseOption(TR_VerbosePerformance))
+   if (TR::Options::getCmdLineOptions()->getVerboseOption(TR_VerboseFootprint))
          TR_VerboseLog::writeLine(TR_Vlog_INFO, "Small pages starting from %p\n", middle);
-
+#endif // ifdef LINUX   
+   
    _coldCodeAllocEnd = _coldCodeAlloc; 
    
    return true;
@@ -1736,6 +1744,7 @@ OMR::CodeCache::allocateCodeMemory(size_t warmCodeSize,
    else
       *coldCode = warmCodeAddress;
 
+#if 0 // for debugging
    if (TR::Options::getCmdLineOptions()->getVerboseOption(TR_VerboseFootprint))
       {
       size_t warm_size = _warmCodeAlloc - _segment->segmentBase() + sizeof(this);
@@ -1745,10 +1754,10 @@ OMR::CodeCache::allocateCodeMemory(size_t warmCodeSize,
                                this, _coldCodeAlloc, _coldCodeAllocEnd,
                                warm_size, cold_size, cold_size * 100.0/warm_size);
       }
+#endif // debugging
    
    return warmCodeAddress;
    }
-
 
 void *
 OMR::CodeCache::getCCPreLoadedCodeAddress(TR_CCPreLoadedCode h, TR::CodeGenerator *codeGenerator)

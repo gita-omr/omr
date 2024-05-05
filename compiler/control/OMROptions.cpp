@@ -4973,7 +4973,9 @@ const char *OMR::Options::_verboseOptionNames[TR_NumVerboseOptions] =
    "vectorAPI",
    "iprofilerPersistence",
    "CheckpointRestore",
-   "CheckpointRestoreDetails"
+   "CheckpointRestoreDetails",
+   "RSSReport",
+   "RSSReportDetailed"
    };
 
 

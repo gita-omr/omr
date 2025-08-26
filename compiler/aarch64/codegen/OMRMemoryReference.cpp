@@ -291,6 +291,9 @@ void OMR::ARM64::MemoryReference::setSymbol(TR::Symbol *symbol, TR::CodeGenerato
 void OMR::ARM64::MemoryReference::validateImmediateOffsetAlignment(TR::Node *node, uint32_t alignment,
     TR::CodeGenerator *cg)
 {
+    if (getSymbolReference()->getSymbol()->isLocalObject())  // GITA
+       return;
+
     intptr_t displacement = self()->getOffset();
     if ((displacement % alignment) != 0) {
         TR::Compilation *comp = cg->comp();
@@ -316,6 +319,7 @@ void OMR::ARM64::MemoryReference::validateImmediateOffsetAlignment(TR::Node *nod
         if (_baseRegister != NULL) {
             if (constantIsUnsignedImm12(displacement)) {
                 generateTrg1Src1ImmInstruction(cg, TR::InstOpCode::addimmx, node, newBase, _baseRegister, displacement);
+
             } else if (node->getOpCode().isLoadConst() && node->getRegister() && (node->getLongInt() == displacement)) {
                 generateTrg1Src2Instruction(cg, TR::InstOpCode::addx, node, newBase, _baseRegister,
                     node->getRegister());

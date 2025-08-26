@@ -5523,7 +5523,9 @@ TR::Register *commonLoadEvaluator(TR::Node *node, TR::InstOpCode::Mnemonic op, i
 
     node->setRegister(targetReg);
     TR::MemoryReference *tempMR = TR::MemoryReference::createWithRootLoadOrStore(cg, node);
-    tempMR->validateImmediateOffsetAlignment(node, size, cg);
+
+    //if (!cg->comp()->getOption(TR_TraceCG) || size != 16)  // GITA
+        tempMR->validateImmediateOffsetAlignment(node, size, cg);
 
     generateTrg1MemInstruction(cg, op, node, targetReg, tempMR);
 

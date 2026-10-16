@@ -1312,6 +1312,72 @@ bool TR_LoopVersioner::isVersionableIfWithExtremum(TR::TreeTop *ifTree, Extremum
     return true;
 }
 
+// Recognise the pattern left by an inlined Preconditions.checkIndex call after
+// Value Propagation has folded away the `index < 0` branch (provable from the
+// induction variable being non-negative).  What survives is a single:
+//
+//   ificmpge(i, length)  ->  throw
+//
+// where `i` is the loop's driving induction variable and `length` is the same
+// invariant as the loop-test upper bound, i.e. the loop is:
+//
+//   for (int i = 0; i < length; i++) { checkIndex(i, length, ...); }
+//
+// This check is semantically identical to BNDCHK(length, i): it fires exactly
+// when the loop would have already exited.  We therefore annotate the node with
+// versionIfWithMaxExpr so that the existing isVersionableIfWithExtremum /
+// buildConditionalTree machinery can eliminate it without any other changes.
+bool TR_LoopVersioner::tryAnnotateCheckIndexIf(TR::Node *ifNode)
+{
+    // Must be ificmpge(iv, loopBound).
+    if (ifNode->getOpCodeValue() != TR::ificmpge)
+        return false;
+
+    // The loop test's shape (direction, branch target, invariant limit) is
+    // validated by isVersionableIfWithExtremum, which the caller re-runs after
+    // we set the flag. We only need the loop test to exist.
+    if (!_loopConditionInvariant || !_loopTestTree)
+        return false;
+
+    // The "max" annotation assumes the *taken* branch is the failing (throw)
+    // side, i.e. it fires when iv >= bound. If the taken side is not cold, the
+    // failing condition is the opposite one (iv < bound), whose extremum is
+    // the other end of the IV's range, so we must not annotate.
+    if (!ifNode->getBranchDestination()->getNode()->getBlock()->isCold())
+        return false;
+
+    // Child 0 must be a direct load of a loop-driving versionable induction
+    // variable. This is the only list isVersionableIfWithExtremum accepts, so
+    // there is no point in annotating on a match in the special or derived lists.
+    TR::Node *lhs = ifNode->getFirstChild();
+    if (!lhs->getOpCode().isLoadVarDirect())
+        return false;
+    int32_t lhsSymRefNum = lhs->getSymbolReference()->getReferenceNumber();
+
+    ListElement<int32_t> *versionableInductionVar = _versionableInductionVariables.getListHead();
+    while (versionableInductionVar && *(versionableInductionVar->getData()) != lhsSymRefNum)
+        versionableInductionVar = versionableInductionVar->getNextElement();
+
+    if (!versionableInductionVar)
+        return false;
+
+    // Child 1 must be invariant.  Any invariant bound is fine; we do not
+    // require it to match the loop-test bound because isVersionableIfWithExtremum
+    // only needs the RHS to be invariant (which it verifies itself via the
+    // loop-test limit check).
+    if (!isExprInvariant(ifNode->getSecondChild()))
+        return false;
+
+    // All conditions met: annotate so that isVersionableIfWithExtremum accepts
+    // this node and buildConditionalTree can version it away.
+    dumpOptDetails(comp(),
+        "tryAnnotateCheckIndexIf: marking n%un [%p] as versionable with max expr "
+        "(matches inlined Preconditions.checkIndex pattern)\n",
+        ifNode->getGlobalIndex(), ifNode);
+    ifNode->setIsVersionableIfWithMaxExpr(comp());
+    return ifNode->isVersionableIfWithMaxExpr();
+}
+
 bool TR_LoopVersioner::detectInvariantConditionals(TR_RegionStructure *whileLoop, List<TR::TreeTop> *trees,
     bool onlyDetectHighlyBiasedBranches, bool *containsNonInlineGuard, SharedSparseBitVector &reverseBranchInLoops)
 {
@@ -1341,8 +1407,8 @@ bool TR_LoopVersioner::detectInvariantConditionals(TR_RegionStructure *whileLoop
                 && static_cast<double>(nextBlock->getNextBlock()->getFrequency()) / nextBlock->getFrequency() >= 0.8) {
                 logprintf(trace(), log, "node %p is highly biased\n", node);
                 highlyBiasedBranch = true;
-            } else if (node->isVersionableIfWithMaxExpr() || node->isVersionableIfWithMinExpr()
-                || node->isMaxLoopIterationGuard()) {
+            } else if (tryAnnotateCheckIndexIf(node) || node->isVersionableIfWithMaxExpr()
+                || node->isVersionableIfWithMinExpr() || node->isMaxLoopIterationGuard()) {
                 logprintf(trace(), log, "node %p is versionable If\n", node);
                 highlyBiasedBranch = true;
             }
@@ -1515,6 +1581,14 @@ bool TR_LoopVersioner::detectInvariantConditionals(TR_RegionStructure *whileLoop
                         isTreeInvariant = true;
                         if (excond.reverseBranch)
                             reverseBranchInLoops[node->getGlobalIndex()] = true;
+                    } else if (tryAnnotateCheckIndexIf(node)) {
+                        // Node is now flagged; re-run isVersionableIfWithExtremum
+                        // which will now succeed.
+                        if (isVersionableIfWithExtremum(nextTree->getData(), &excond)) {
+                            isTreeInvariant = true;
+                            if (excond.reverseBranch)
+                                reverseBranchInLoops[node->getGlobalIndex()] = true;
+                        }
                     }
                 }
             } else

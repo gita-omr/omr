@@ -997,6 +997,7 @@ protected:
     };
 
     bool isVersionableIfWithExtremum(TR::TreeTop *ifTree, ExtremumConditional *out);
+    bool tryAnnotateCheckIndexIf(TR::Node *ifNode);
 
     bool isExprInvariant(TR::Node *, bool ignoreHeapificationStore = false); // ignoreHeapificationStore flags for both
     bool areAllChildrenInvariant(TR::Node *, bool ignoreHeapificationStore = false);
